@@ -21,11 +21,11 @@ ocaml, cpp, gccがインストールされているUnix系環境なら多分動�
 $ make
 
 実行:
-$ ./sinc file... [-o output]
+$ ./sincl file... [-o output]
 
 入力ファイルの拡張子は.scにして下さい．
 例えば
-$ ./sinc hello.sc -o hello
+$ ./sincl hello.sc -o hello
 とすると，hello.cというC言語のコードとhelloという実行可能
 バイナリを生成します．
 
