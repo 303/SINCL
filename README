@@ -43,7 +43,9 @@ $ ./sinc hello.sc -o hello
   unsigned const int;   /* NG */
   int typedef x;        /* NG */
   ...
-
+- unsigned/signedを単独で型として使うことはできません．
+  unsigned x = 1;       /* NG */
+  unsigned int x = 1;   /* OK */
 - 名前無しのenum/struct/unionは定義できません．
 - struct等の定義と変数定義は同時にできないようにしています．
   (理由)文法が汚いから．
@@ -54,11 +56,6 @@ $ ./sinc hello.sc -o hello
   (理由) 文法が汚い，無くても困らないはず
     void f (x)
       int x;    /* NG */
-    {
-      ...
-    }
-- 可変長引数を持つ関数定義は未実装です．
-    void f (int x, ...) /* NG */
     {
       ...
     }
