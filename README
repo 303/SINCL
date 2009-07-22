@@ -1,0 +1,72 @@
+SINCL: SINCL Is New C Language
+
+SINCLとは2chのプログラム板スレッド"新C言語を作ろう"で
+言語開発のベースとする為に作ったC言語へのトランスレータ
+です．
+
+現状ではほぼ劣化C言語です． まだ完成していません．
+今後いろいろな変更が行われていくかもしれません．
+
+
+ライセンス:
+コードの一部にObjective Camlから流用したものが含まれます
+ので， Objective Camlのライセンスに準拠します．
+詳しくはLICENSEを読んで下さい．
+
+動作環境:
+ocaml, cpp, gccがインストールされているUnix系環境なら多分動きます
+
+
+コンパイル:
+$ make
+
+実行:
+$ ./sinc file... [-o output]
+
+入力ファイルの拡張子は.scにして下さい．
+例えば
+$ ./sinc hello.sc -o hello
+とすると，hello.cというC言語のコードとhelloという実行可能
+バイナリを生成します．
+
+
+文法:
+ほぼC言語です．以下の点が異なります．
+
+- プリプロセッサは使えますが，ユーザヘッダ以外はインクルード出来ません．
+  (理由)システムヘッダにはGCC拡張等が入っている為．
+- 記憶域指示子,型指示子, 型修飾子等の順番を以下のように制限しています．
+  [typedef/static/extern..] -> [const/volatile..] -> [signed/unsigned]
+  -> [short/long] -> [char/int/..]
+
+  int unsigned;         /* NG */
+  unsigned const int;   /* NG */
+  int typedef x;        /* NG */
+  ...
+
+- 名前無しのenum/struct/unionは定義できません．
+- struct等の定義と変数定義は同時にできないようにしています．
+  (理由)文法が汚いから．
+    struct hoge {
+       ... 
+    } x;        /* NG */
+- 旧形式の関数定義はできません．
+  (理由) 文法が汚い，無くても困らないはず
+    void f (x)
+      int x;    /* NG */
+    {
+      ...
+    }
+- 可変長引数を持つ関数定義は未実装です．
+    void f (int x, ...) /* NG */
+    {
+      ...
+    }
+- for文内での変数宣言は未実装です．
+    for (int i = 0; ...; ...) /* NG */
+- designatorには対応していません．
+    int x[3] = {
+        [0] = ..,   /* NG */
+        ...
+    };
+- その他いろいろ

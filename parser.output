@@ -1,0 +1,7057 @@
+   0  $accept : %entry% $end
+
+   1  nsenter :
+
+   2  nsleave :
+
+   3  nsreenter :
+
+   4  translation_unit : external_declaration_list Teof
+
+   5  external_declaration_list :
+   6                            | external_declaration_list external_declaration
+
+   7  external_declaration : Tdirective
+   8                       | function_definition
+   9                       | declaration
+
+  10  declaration_specifiers : storage_class_specifier itype
+
+  11  declaration : Ttypedef itype declarator Tsemi
+  12              | composite_type_decl
+  13              | declaration_specifiers init_declarator_list Tsemi
+
+  14  init_declarator_list : init_declarator
+  15                       | init_declarator_list Tcomma init_declarator
+
+  16  init_declarator : declarator
+  17                  | declarator Tasgn init
+
+  18  init : assignment_expression
+  19       | Tlbrace init_list Trbrace
+  20       | Tlbrace init_list Tcomma Trbrace
+
+  21  function_definition : declaration_specifiers function_declarator Tlbrace nsreenter blockitem_list_opt nsleave Trbrace
+
+  22  function_declarator : pointer function_direct_declarator
+  23                      | function_direct_declarator
+
+  24  function_direct_declarator : direct_declarator Tlparen nsenter parameter_type_list nsleave Trparen
+  25                             | direct_declarator Tlparen Trparen
+
+  26  declarator : pointer direct_declarator
+  27             | direct_declarator
+
+  28  pointer : Tstar typequalifiers
+  29          | Tstar typequalifiers pointer
+
+  30  direct_declarator : Tidentifier
+  31                    | Tlparen declarator Trparen
+  32                    | direct_declarator Tlbracket Trbracket
+  33                    | direct_declarator Tlbracket typequalifiers assignment_expression Trbracket
+  34                    | direct_declarator Tlparen Trparen
+  35                    | direct_declarator Tlparen nsenter parameter_type_list nsleave Trparen
+
+  36  abstract_declarator_opt :
+  37                          | abstract_declarator
+
+  38  abstract_declarator : pointer
+  39                      | direct_abstract_declarator
+  40                      | pointer direct_abstract_declarator
+
+  41  direct_abstract_declarator : Tlparen abstract_declarator Trparen
+  42                             | Tlbracket assignment_expression_opt Trbracket
+  43                             | direct_abstract_declarator Tlbracket assignment_expression_opt Trbracket
+  44                             | Tlparen Trparen
+  45                             | Tlparen nsenter parameter_type_list nsleave Trparen
+  46                             | direct_abstract_declarator Tlparen Trparen
+  47                             | direct_abstract_declarator Tlparen nsenter parameter_type_list nsleave Trparen
+
+  48  parameter_type_list : parameter_list
+  49                      | parameter_list Tcomma Tellipsis
+
+  50  parameter_list : parameter_declaration
+  51                 | parameter_list Tcomma parameter_declaration
+
+  52  parameter_declaration : itype declarator
+  53                        | itype abstract_declarator_opt
+
+  54  init_list : init
+  55            | init_list Tcomma init
+
+  56  itype : typequalifiers itype_simple
+  57        | itype_simple
+
+  58  itypename : itype abstract_declarator_opt
+
+  59  inttype : Tchar
+  60          | Tshort
+  61          | Tshort Tint
+  62          | Tint
+  63          | Tlong
+  64          | Tlong Tint
+  65          | Tlong Tlong
+  66          | Tlong Tlong Tint
+  67          | Tunsigned Tchar
+  68          | Tunsigned Tshort
+  69          | Tunsigned Tshort Tint
+  70          | Tunsigned Tint
+  71          | Tunsigned Tlong
+  72          | Tunsigned Tlong Tint
+  73          | Tunsigned Tlong Tlong
+  74          | Tunsigned Tlong Tlong Tint
+
+  75  realtype : Tfloat
+  76           | Tdouble
+  77           | Tlong Tdouble
+
+  78  composite_type : Tstruct sue_identifier
+  79                 | Tunion sue_identifier
+  80                 | Tenum sue_identifier
+
+  81  itype_simple : Tvoid
+  82               | inttype
+  83               | realtype
+  84               | composite_type
+  85               | Ttypedef_name
+
+  86  typequalifier : Tconst
+  87                | Tvolatile
+  88                | Trestrict
+
+  89  typequalifiers :
+  90                 | typequalifiers typequalifier
+
+  91  storage_class_specifier :
+  92                          | Tstatic
+  93                          | Textern
+
+  94  sue_identifier : Tidentifier
+  95                 | Ttypedef_name
+  96                 | Tenum_const
+
+  97  composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list Trbrace Tsemi
+  98                      | Tenum sue_identifier Tlbrace enumerator_list Tcomma Trbrace Tsemi
+  99                      | Tstruct sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi
+ 100                      | Tunion sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi
+
+ 101  enumerator_list : enumerator
+ 102                  | enumerator_list Tcomma enumerator
+
+ 103  enumerator : Tidentifier
+ 104             | Tidentifier Teq constant_expression
+
+ 105  struct_declaration_list_opt :
+ 106                              | struct_declaration_list_opt struct_declaration
+
+ 107  struct_declaration : itype struct_declarator_list Tsemi
+
+ 108  struct_declarator_list : struct_declarator
+ 109                         | struct_declarator_list Tcomma struct_declarator
+
+ 110  struct_declarator : declarator
+
+ 111  statement : labeled_statement
+ 112            | compound_statement
+ 113            | expression_statement
+ 114            | selection_statement
+ 115            | iteration_statement
+ 116            | jump_statement
+
+ 117  labeled_statement : label Tcolon statement
+ 118                    | Tcase constant_expression Tcolon statement
+ 119                    | Tdefault Tcolon statement
+
+ 120  label : Tidentifier
+ 121        | Ttypedef_name
+ 122        | Tenum_const
+
+ 123  compound_statement : Tlbrace nsenter blockitem_list_opt nsleave Trbrace
+
+ 124  blockitem_list_opt :
+ 125                     | blockitem_list_opt declaration
+ 126                     | blockitem_list_opt statement
+
+ 127  expression_statement : expression_opt Tsemi
+
+ 128  expression_opt :
+ 129                 | expression
+
+ 130  selection_statement : Tif Tlparen expression Trparen statement
+ 131                      | Tif Tlparen expression Trparen statement Telse statement
+ 132                      | Tswitch Tlparen expression Trparen statement
+
+ 133  iteration_statement : Twhile Tlparen expression Trparen statement
+ 134                      | Tdo statement Twhile Tlparen expression Trparen Tsemi
+ 135                      | Tfor Tlparen expression_opt Tsemi expression_opt Tsemi expression_opt Trparen statement
+
+ 136  jump_statement : Tgoto label Tsemi
+ 137                 | Tcontinue Tsemi
+ 138                 | Tbreak Tsemi
+ 139                 | Treturn expression_opt Tsemi
+
+ 140  expression : assignment_expression
+ 141             | expression Tcomma assignment_expression
+
+ 142  assignment_expression : conditional_expression
+ 143                        | unary_expression Tasgn expression
+ 144                        | unary_expression Tmulasgn expression
+ 145                        | unary_expression Tdivasgn expression
+ 146                        | unary_expression Tmodasgn expression
+ 147                        | unary_expression Taddasgn expression
+ 148                        | unary_expression Tsubasgn expression
+ 149                        | unary_expression Tlshiftasgn expression
+ 150                        | unary_expression Trshiftasgn expression
+ 151                        | unary_expression Tandasgn expression
+ 152                        | unary_expression Txorasgn expression
+ 153                        | unary_expression Torasgn expression
+
+ 154  conditional_expression : logical_or_expression
+ 155                         | logical_or_expression Tquestion expression Tcolon conditional_expression
+
+ 156  constant_expression : conditional_expression
+
+ 157  logical_or_expression : logical_and_expression
+ 158                        | logical_or_expression Tseqor logical_and_expression
+
+ 159  logical_and_expression : inclusive_or_expression
+ 160                         | logical_and_expression Tseqand inclusive_or_expression
+
+ 161  inclusive_or_expression : exclusive_or_expression
+ 162                          | inclusive_or_expression Tor exclusive_or_expression
+
+ 163  exclusive_or_expression : and_expression
+ 164                          | exclusive_or_expression Txor and_expression
+
+ 165  and_expression : equality_expression
+ 166                 | and_expression Tamp equality_expression
+
+ 167  equality_expression : relation_expression
+ 168                      | equality_expression Teq relation_expression
+ 169                      | equality_expression Tne relation_expression
+
+ 170  relation_expression : shift_expression
+ 171                      | relation_expression Tlt shift_expression
+ 172                      | relation_expression Tgt shift_expression
+ 173                      | relation_expression Tle shift_expression
+ 174                      | relation_expression Tge shift_expression
+
+ 175  shift_expression : additive_expression
+ 176                   | shift_expression Tlshift additive_expression
+ 177                   | shift_expression Trshift additive_expression
+
+ 178  additive_expression : multiplicative_expression
+ 179                      | additive_expression Tplus multiplicative_expression
+ 180                      | additive_expression Tminus multiplicative_expression
+
+ 181  multiplicative_expression : cast_expression
+ 182                            | multiplicative_expression Tstar cast_expression
+ 183                            | multiplicative_expression Tdiv cast_expression
+ 184                            | multiplicative_expression Tmod cast_expression
+
+ 185  cast_expression : unary_expression
+ 186                  | Tlparen itypename Trparen cast_expression
+
+ 187  unary_expression : postfix_expression
+ 188                   | Tplusplus unary_expression
+ 189                   | Tminusminus unary_expression
+ 190                   | Tplus cast_expression
+ 191                   | Tminus cast_expression
+ 192                   | Ttilde cast_expression
+ 193                   | Tbang cast_expression
+ 194                   | Tamp cast_expression
+ 195                   | Tstar cast_expression
+ 196                   | Tsizeof unary_expression
+ 197                   | Tsizeof Tlparen itypename Trparen
+
+ 198  postfix_expression : primary_expression
+ 199                     | postfix_expression Tlbracket expression Trbracket
+ 200                     | postfix_expression Tlparen argument_expression_list_opt Trparen
+ 201                     | postfix_expression Tdo Tidentifier
+ 202                     | postfix_expression Tarrow Tidentifier
+ 203                     | postfix_expression Tplusplus
+ 204                     | postfix_expression Tminusminus
+
+ 205  primary_expression : Tidentifier
+ 206                     | constant
+ 207                     | Tlparen expression Trparen
+
+ 208  argument_expression_list_opt :
+ 209                               | argument_expression_list
+
+ 210  argument_expression_list : assignment_expression
+ 211                           | argument_expression_list Tcomma assignment_expression
+
+ 212  assignment_expression_opt :
+ 213                            | assignment_expression
+
+ 214  constant : Tfloating_cst
+ 215           | Tinteger_cst
+ 216           | Tcharacter_cst
+ 217           | Tstring_literal
+ 218           | Tenum_const
+
+ 219  %entry% : '\001' translation_unit
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . translation_unit  (219)
+	external_declaration_list : .  (5)
+
+	.  reduce 5
+
+	translation_unit  goto 3
+	external_declaration_list  goto 4
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	%entry% : '\001' translation_unit .  (219)
+
+	.  reduce 219
+
+
+4: shift/reduce conflict (shift 9, reduce 91) on Tstruct
+4: shift/reduce conflict (shift 10, reduce 91) on Tunion
+4: shift/reduce conflict (shift 11, reduce 91) on Tenum
+state 4
+	translation_unit : external_declaration_list . Teof  (4)
+	external_declaration_list : external_declaration_list . external_declaration  (6)
+	storage_class_specifier : .  (91)
+
+	Tdirective  shift 5
+	Ttypedef  shift 6
+	Textern  shift 7
+	Tstatic  shift 8
+	Tstruct  shift 9
+	Tunion  shift 10
+	Tenum  shift 11
+	Teof  shift 12
+	Ttypedef_name  reduce 91
+	Trestrict  reduce 91
+	Tchar  reduce 91
+	Tshort  reduce 91
+	Tint  reduce 91
+	Tlong  reduce 91
+	Tunsigned  reduce 91
+	Tfloat  reduce 91
+	Tdouble  reduce 91
+	Tconst  reduce 91
+	Tvolatile  reduce 91
+	Tvoid  reduce 91
+
+	external_declaration  goto 13
+	function_definition  goto 14
+	declaration  goto 15
+	declaration_specifiers  goto 16
+	storage_class_specifier  goto 17
+	composite_type_decl  goto 18
+
+
+state 5
+	external_declaration : Tdirective .  (7)
+
+	.  reduce 7
+
+
+6: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+6: shift/reduce conflict (shift 20, reduce 89) on Tchar
+6: shift/reduce conflict (shift 21, reduce 89) on Tshort
+6: shift/reduce conflict (shift 22, reduce 89) on Tint
+6: shift/reduce conflict (shift 23, reduce 89) on Tlong
+6: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+6: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+6: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+6: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+6: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+6: shift/reduce conflict (shift 29, reduce 89) on Tunion
+6: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 6
+	declaration : Ttypedef . itype declarator Tsemi  (11)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 31
+	typequalifiers  goto 32
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+
+
+state 7
+	storage_class_specifier : Textern .  (93)
+
+	.  reduce 93
+
+
+state 8
+	storage_class_specifier : Tstatic .  (92)
+
+	.  reduce 92
+
+
+state 9
+	composite_type_decl : Tstruct . sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi  (99)
+
+	Tidentifier  shift 37
+	Ttypedef_name  shift 38
+	Tenum_const  shift 39
+	.  error
+
+	sue_identifier  goto 40
+
+
+state 10
+	composite_type_decl : Tunion . sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi  (100)
+
+	Tidentifier  shift 37
+	Ttypedef_name  shift 38
+	Tenum_const  shift 39
+	.  error
+
+	sue_identifier  goto 41
+
+
+state 11
+	composite_type_decl : Tenum . sue_identifier Tlbrace enumerator_list Trbrace Tsemi  (97)
+	composite_type_decl : Tenum . sue_identifier Tlbrace enumerator_list Tcomma Trbrace Tsemi  (98)
+
+	Tidentifier  shift 37
+	Ttypedef_name  shift 38
+	Tenum_const  shift 39
+	.  error
+
+	sue_identifier  goto 42
+
+
+state 12
+	translation_unit : external_declaration_list Teof .  (4)
+
+	.  reduce 4
+
+
+state 13
+	external_declaration_list : external_declaration_list external_declaration .  (6)
+
+	.  reduce 6
+
+
+state 14
+	external_declaration : function_definition .  (8)
+
+	.  reduce 8
+
+
+state 15
+	external_declaration : declaration .  (9)
+
+	.  reduce 9
+
+
+state 16
+	declaration : declaration_specifiers . init_declarator_list Tsemi  (13)
+	function_definition : declaration_specifiers . function_declarator Tlbrace nsreenter blockitem_list_opt nsleave Trbrace  (21)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlparen  shift 45
+	.  error
+
+	declarator  goto 46
+	init_declarator_list  goto 47
+	init_declarator  goto 48
+	function_declarator  goto 49
+	pointer  goto 50
+	function_direct_declarator  goto 51
+	direct_declarator  goto 52
+
+
+17: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+17: shift/reduce conflict (shift 20, reduce 89) on Tchar
+17: shift/reduce conflict (shift 21, reduce 89) on Tshort
+17: shift/reduce conflict (shift 22, reduce 89) on Tint
+17: shift/reduce conflict (shift 23, reduce 89) on Tlong
+17: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+17: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+17: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+17: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+17: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+17: shift/reduce conflict (shift 29, reduce 89) on Tunion
+17: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 17
+	declaration_specifiers : storage_class_specifier . itype  (10)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 53
+	typequalifiers  goto 32
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+
+
+state 18
+	declaration : composite_type_decl .  (12)
+
+	.  reduce 12
+
+
+state 19
+	itype_simple : Ttypedef_name .  (85)
+
+	.  reduce 85
+
+
+state 20
+	inttype : Tchar .  (59)
+
+	.  reduce 59
+
+
+state 21
+	inttype : Tshort .  (60)
+	inttype : Tshort . Tint  (61)
+
+	Tint  shift 54
+	Tidentifier  reduce 60
+	Tcomma  reduce 60
+	Tstar  reduce 60
+	Tlbracket  reduce 60
+	Tlparen  reduce 60
+	Trparen  reduce 60
+
+
+state 22
+	inttype : Tint .  (62)
+
+	.  reduce 62
+
+
+state 23
+	inttype : Tlong .  (63)
+	inttype : Tlong . Tint  (64)
+	inttype : Tlong . Tlong  (65)
+	inttype : Tlong . Tlong Tint  (66)
+	realtype : Tlong . Tdouble  (77)
+
+	Tint  shift 55
+	Tlong  shift 56
+	Tdouble  shift 57
+	Tidentifier  reduce 63
+	Tcomma  reduce 63
+	Tstar  reduce 63
+	Tlbracket  reduce 63
+	Tlparen  reduce 63
+	Trparen  reduce 63
+
+
+state 24
+	inttype : Tunsigned . Tchar  (67)
+	inttype : Tunsigned . Tshort  (68)
+	inttype : Tunsigned . Tshort Tint  (69)
+	inttype : Tunsigned . Tint  (70)
+	inttype : Tunsigned . Tlong  (71)
+	inttype : Tunsigned . Tlong Tint  (72)
+	inttype : Tunsigned . Tlong Tlong  (73)
+	inttype : Tunsigned . Tlong Tlong Tint  (74)
+
+	Tchar  shift 58
+	Tshort  shift 59
+	Tint  shift 60
+	Tlong  shift 61
+	.  error
+
+
+state 25
+	realtype : Tfloat .  (75)
+
+	.  reduce 75
+
+
+state 26
+	realtype : Tdouble .  (76)
+
+	.  reduce 76
+
+
+state 27
+	itype_simple : Tvoid .  (81)
+
+	.  reduce 81
+
+
+state 28
+	composite_type : Tstruct . sue_identifier  (78)
+
+	Tidentifier  shift 37
+	Ttypedef_name  shift 38
+	Tenum_const  shift 39
+	.  error
+
+	sue_identifier  goto 62
+
+
+state 29
+	composite_type : Tunion . sue_identifier  (79)
+
+	Tidentifier  shift 37
+	Ttypedef_name  shift 38
+	Tenum_const  shift 39
+	.  error
+
+	sue_identifier  goto 63
+
+
+state 30
+	composite_type : Tenum . sue_identifier  (80)
+
+	Tidentifier  shift 37
+	Ttypedef_name  shift 38
+	Tenum_const  shift 39
+	.  error
+
+	sue_identifier  goto 64
+
+
+state 31
+	declaration : Ttypedef itype . declarator Tsemi  (11)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlparen  shift 45
+	.  error
+
+	declarator  goto 65
+	pointer  goto 66
+	direct_declarator  goto 67
+
+
+state 32
+	itype : typequalifiers . itype_simple  (56)
+	typequalifiers : typequalifiers . typequalifier  (90)
+
+	Ttypedef_name  shift 19
+	Trestrict  shift 68
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tconst  shift 69
+	Tvolatile  shift 70
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	.  error
+
+	itype_simple  goto 71
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+	typequalifier  goto 72
+
+
+state 33
+	itype : itype_simple .  (57)
+
+	.  reduce 57
+
+
+state 34
+	itype_simple : inttype .  (82)
+
+	.  reduce 82
+
+
+state 35
+	itype_simple : realtype .  (83)
+
+	.  reduce 83
+
+
+state 36
+	itype_simple : composite_type .  (84)
+
+	.  reduce 84
+
+
+state 37
+	sue_identifier : Tidentifier .  (94)
+
+	.  reduce 94
+
+
+state 38
+	sue_identifier : Ttypedef_name .  (95)
+
+	.  reduce 95
+
+
+state 39
+	sue_identifier : Tenum_const .  (96)
+
+	.  reduce 96
+
+
+state 40
+	composite_type_decl : Tstruct sue_identifier . Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi  (99)
+
+	Tlbrace  shift 73
+	.  error
+
+
+state 41
+	composite_type_decl : Tunion sue_identifier . Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi  (100)
+
+	Tlbrace  shift 74
+	.  error
+
+
+state 42
+	composite_type_decl : Tenum sue_identifier . Tlbrace enumerator_list Trbrace Tsemi  (97)
+	composite_type_decl : Tenum sue_identifier . Tlbrace enumerator_list Tcomma Trbrace Tsemi  (98)
+
+	Tlbrace  shift 75
+	.  error
+
+
+state 43
+	direct_declarator : Tidentifier .  (30)
+
+	.  reduce 30
+
+
+state 44
+	pointer : Tstar . typequalifiers  (28)
+	pointer : Tstar . typequalifiers pointer  (29)
+	typequalifiers : .  (89)
+
+	.  reduce 89
+
+	typequalifiers  goto 76
+
+
+state 45
+	direct_declarator : Tlparen . declarator Trparen  (31)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlparen  shift 45
+	.  error
+
+	declarator  goto 77
+	pointer  goto 66
+	direct_declarator  goto 67
+
+
+state 46
+	init_declarator : declarator .  (16)
+	init_declarator : declarator . Tasgn init  (17)
+
+	Tasgn  shift 78
+	Tcomma  reduce 16
+	Tsemi  reduce 16
+
+
+state 47
+	declaration : declaration_specifiers init_declarator_list . Tsemi  (13)
+	init_declarator_list : init_declarator_list . Tcomma init_declarator  (15)
+
+	Tcomma  shift 79
+	Tsemi  shift 80
+	.  error
+
+
+state 48
+	init_declarator_list : init_declarator .  (14)
+
+	.  reduce 14
+
+
+state 49
+	function_definition : declaration_specifiers function_declarator . Tlbrace nsreenter blockitem_list_opt nsleave Trbrace  (21)
+
+	Tlbrace  shift 81
+	.  error
+
+
+state 50
+	function_declarator : pointer . function_direct_declarator  (22)
+	declarator : pointer . direct_declarator  (26)
+
+	Tidentifier  shift 43
+	Tlparen  shift 45
+	.  error
+
+	function_direct_declarator  goto 82
+	direct_declarator  goto 83
+
+
+state 51
+	function_declarator : function_direct_declarator .  (23)
+
+	.  reduce 23
+
+
+state 52
+	function_direct_declarator : direct_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (24)
+	function_direct_declarator : direct_declarator . Tlparen Trparen  (25)
+	declarator : direct_declarator .  (27)
+	direct_declarator : direct_declarator . Tlbracket Trbracket  (32)
+	direct_declarator : direct_declarator . Tlbracket typequalifiers assignment_expression Trbracket  (33)
+	direct_declarator : direct_declarator . Tlparen Trparen  (34)
+	direct_declarator : direct_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (35)
+
+	Tlbracket  shift 84
+	Tlparen  shift 85
+	Tcomma  reduce 27
+	Tasgn  reduce 27
+	Tsemi  reduce 27
+
+
+state 53
+	declaration_specifiers : storage_class_specifier itype .  (10)
+
+	.  reduce 10
+
+
+state 54
+	inttype : Tshort Tint .  (61)
+
+	.  reduce 61
+
+
+state 55
+	inttype : Tlong Tint .  (64)
+
+	.  reduce 64
+
+
+state 56
+	inttype : Tlong Tlong .  (65)
+	inttype : Tlong Tlong . Tint  (66)
+
+	Tint  shift 86
+	Tidentifier  reduce 65
+	Tcomma  reduce 65
+	Tstar  reduce 65
+	Tlbracket  reduce 65
+	Tlparen  reduce 65
+	Trparen  reduce 65
+
+
+state 57
+	realtype : Tlong Tdouble .  (77)
+
+	.  reduce 77
+
+
+state 58
+	inttype : Tunsigned Tchar .  (67)
+
+	.  reduce 67
+
+
+state 59
+	inttype : Tunsigned Tshort .  (68)
+	inttype : Tunsigned Tshort . Tint  (69)
+
+	Tint  shift 87
+	Tidentifier  reduce 68
+	Tcomma  reduce 68
+	Tstar  reduce 68
+	Tlbracket  reduce 68
+	Tlparen  reduce 68
+	Trparen  reduce 68
+
+
+state 60
+	inttype : Tunsigned Tint .  (70)
+
+	.  reduce 70
+
+
+state 61
+	inttype : Tunsigned Tlong .  (71)
+	inttype : Tunsigned Tlong . Tint  (72)
+	inttype : Tunsigned Tlong . Tlong  (73)
+	inttype : Tunsigned Tlong . Tlong Tint  (74)
+
+	Tint  shift 88
+	Tlong  shift 89
+	Tidentifier  reduce 71
+	Tcomma  reduce 71
+	Tstar  reduce 71
+	Tlbracket  reduce 71
+	Tlparen  reduce 71
+	Trparen  reduce 71
+
+
+state 62
+	composite_type : Tstruct sue_identifier .  (78)
+
+	.  reduce 78
+
+
+state 63
+	composite_type : Tunion sue_identifier .  (79)
+
+	.  reduce 79
+
+
+state 64
+	composite_type : Tenum sue_identifier .  (80)
+
+	.  reduce 80
+
+
+state 65
+	declaration : Ttypedef itype declarator . Tsemi  (11)
+
+	Tsemi  shift 90
+	.  error
+
+
+state 66
+	declarator : pointer . direct_declarator  (26)
+
+	Tidentifier  shift 43
+	Tlparen  shift 45
+	.  error
+
+	direct_declarator  goto 91
+
+
+state 67
+	declarator : direct_declarator .  (27)
+	direct_declarator : direct_declarator . Tlbracket Trbracket  (32)
+	direct_declarator : direct_declarator . Tlbracket typequalifiers assignment_expression Trbracket  (33)
+	direct_declarator : direct_declarator . Tlparen Trparen  (34)
+	direct_declarator : direct_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (35)
+
+	Tlbracket  shift 84
+	Tlparen  shift 92
+	Tcomma  reduce 27
+	Tasgn  reduce 27
+	Trparen  reduce 27
+	Tsemi  reduce 27
+
+
+state 68
+	typequalifier : Trestrict .  (88)
+
+	.  reduce 88
+
+
+state 69
+	typequalifier : Tconst .  (86)
+
+	.  reduce 86
+
+
+state 70
+	typequalifier : Tvolatile .  (87)
+
+	.  reduce 87
+
+
+state 71
+	itype : typequalifiers itype_simple .  (56)
+
+	.  reduce 56
+
+
+state 72
+	typequalifiers : typequalifiers typequalifier .  (90)
+
+	.  reduce 90
+
+
+state 73
+	composite_type_decl : Tstruct sue_identifier Tlbrace . nsenter struct_declaration_list_opt nsleave Trbrace Tsemi  (99)
+	nsenter : .  (1)
+
+	.  reduce 1
+
+	nsenter  goto 93
+
+
+state 74
+	composite_type_decl : Tunion sue_identifier Tlbrace . nsenter struct_declaration_list_opt nsleave Trbrace Tsemi  (100)
+	nsenter : .  (1)
+
+	.  reduce 1
+
+	nsenter  goto 94
+
+
+state 75
+	composite_type_decl : Tenum sue_identifier Tlbrace . enumerator_list Trbrace Tsemi  (97)
+	composite_type_decl : Tenum sue_identifier Tlbrace . enumerator_list Tcomma Trbrace Tsemi  (98)
+
+	Tidentifier  shift 95
+	.  error
+
+	enumerator_list  goto 96
+	enumerator  goto 97
+
+
+state 76
+	pointer : Tstar typequalifiers .  (28)
+	pointer : Tstar typequalifiers . pointer  (29)
+	typequalifiers : typequalifiers . typequalifier  (90)
+
+	Trestrict  shift 68
+	Tconst  shift 69
+	Tvolatile  shift 70
+	Tstar  shift 44
+	Tidentifier  reduce 28
+	Tcomma  reduce 28
+	Tlbracket  reduce 28
+	Tlparen  reduce 28
+	Trparen  reduce 28
+
+	pointer  goto 98
+	typequalifier  goto 72
+
+
+state 77
+	direct_declarator : Tlparen declarator . Trparen  (31)
+
+	Trparen  shift 99
+	.  error
+
+
+state 78
+	init_declarator : declarator Tasgn . init  (17)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 115
+	Tlparen  shift 116
+	.  error
+
+	init  goto 117
+	assignment_expression  goto 118
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 79
+	init_declarator_list : init_declarator_list Tcomma . init_declarator  (15)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlparen  shift 45
+	.  error
+
+	declarator  goto 46
+	init_declarator  goto 135
+	pointer  goto 66
+	direct_declarator  goto 67
+
+
+state 80
+	declaration : declaration_specifiers init_declarator_list Tsemi .  (13)
+
+	.  reduce 13
+
+
+state 81
+	function_definition : declaration_specifiers function_declarator Tlbrace . nsreenter blockitem_list_opt nsleave Trbrace  (21)
+	nsreenter : .  (3)
+
+	.  reduce 3
+
+	nsreenter  goto 136
+
+
+state 82
+	function_declarator : pointer function_direct_declarator .  (22)
+
+	.  reduce 22
+
+
+state 83
+	function_direct_declarator : direct_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (24)
+	function_direct_declarator : direct_declarator . Tlparen Trparen  (25)
+	declarator : pointer direct_declarator .  (26)
+	direct_declarator : direct_declarator . Tlbracket Trbracket  (32)
+	direct_declarator : direct_declarator . Tlbracket typequalifiers assignment_expression Trbracket  (33)
+	direct_declarator : direct_declarator . Tlparen Trparen  (34)
+	direct_declarator : direct_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (35)
+
+	Tlbracket  shift 84
+	Tlparen  shift 85
+	Tcomma  reduce 26
+	Tasgn  reduce 26
+	Tsemi  reduce 26
+
+
+state 84
+	direct_declarator : direct_declarator Tlbracket . Trbracket  (32)
+	direct_declarator : direct_declarator Tlbracket . typequalifiers assignment_expression Trbracket  (33)
+	typequalifiers : .  (89)
+
+	Trbracket  shift 137
+	Tidentifier  reduce 89
+	Tenum_const  reduce 89
+	Tcharacter_cst  reduce 89
+	Tinteger_cst  reduce 89
+	Tfloating_cst  reduce 89
+	Tstring_literal  reduce 89
+	Tsizeof  reduce 89
+	Tplusplus  reduce 89
+	Tminusminus  reduce 89
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+	Tamp  reduce 89
+	Ttilde  reduce 89
+	Tbang  reduce 89
+	Tplus  reduce 89
+	Tminus  reduce 89
+	Tstar  reduce 89
+	Tlparen  reduce 89
+
+	typequalifiers  goto 138
+
+
+state 85
+	function_direct_declarator : direct_declarator Tlparen . nsenter parameter_type_list nsleave Trparen  (24)
+	function_direct_declarator : direct_declarator Tlparen . Trparen  (25)
+	direct_declarator : direct_declarator Tlparen . Trparen  (34)
+	direct_declarator : direct_declarator Tlparen . nsenter parameter_type_list nsleave Trparen  (35)
+	nsenter : .  (1)
+
+	Trparen  shift 139
+	Ttypedef_name  reduce 1
+	Trestrict  reduce 1
+	Tchar  reduce 1
+	Tshort  reduce 1
+	Tint  reduce 1
+	Tlong  reduce 1
+	Tunsigned  reduce 1
+	Tfloat  reduce 1
+	Tdouble  reduce 1
+	Tconst  reduce 1
+	Tvolatile  reduce 1
+	Tvoid  reduce 1
+	Tstruct  reduce 1
+	Tunion  reduce 1
+	Tenum  reduce 1
+
+	nsenter  goto 140
+
+
+state 86
+	inttype : Tlong Tlong Tint .  (66)
+
+	.  reduce 66
+
+
+state 87
+	inttype : Tunsigned Tshort Tint .  (69)
+
+	.  reduce 69
+
+
+state 88
+	inttype : Tunsigned Tlong Tint .  (72)
+
+	.  reduce 72
+
+
+state 89
+	inttype : Tunsigned Tlong Tlong .  (73)
+	inttype : Tunsigned Tlong Tlong . Tint  (74)
+
+	Tint  shift 141
+	Tidentifier  reduce 73
+	Tcomma  reduce 73
+	Tstar  reduce 73
+	Tlbracket  reduce 73
+	Tlparen  reduce 73
+	Trparen  reduce 73
+
+
+state 90
+	declaration : Ttypedef itype declarator Tsemi .  (11)
+
+	.  reduce 11
+
+
+state 91
+	declarator : pointer direct_declarator .  (26)
+	direct_declarator : direct_declarator . Tlbracket Trbracket  (32)
+	direct_declarator : direct_declarator . Tlbracket typequalifiers assignment_expression Trbracket  (33)
+	direct_declarator : direct_declarator . Tlparen Trparen  (34)
+	direct_declarator : direct_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (35)
+
+	Tlbracket  shift 84
+	Tlparen  shift 92
+	Tcomma  reduce 26
+	Tasgn  reduce 26
+	Trparen  reduce 26
+	Tsemi  reduce 26
+
+
+state 92
+	direct_declarator : direct_declarator Tlparen . Trparen  (34)
+	direct_declarator : direct_declarator Tlparen . nsenter parameter_type_list nsleave Trparen  (35)
+	nsenter : .  (1)
+
+	Trparen  shift 142
+	Ttypedef_name  reduce 1
+	Trestrict  reduce 1
+	Tchar  reduce 1
+	Tshort  reduce 1
+	Tint  reduce 1
+	Tlong  reduce 1
+	Tunsigned  reduce 1
+	Tfloat  reduce 1
+	Tdouble  reduce 1
+	Tconst  reduce 1
+	Tvolatile  reduce 1
+	Tvoid  reduce 1
+	Tstruct  reduce 1
+	Tunion  reduce 1
+	Tenum  reduce 1
+
+	nsenter  goto 143
+
+
+state 93
+	composite_type_decl : Tstruct sue_identifier Tlbrace nsenter . struct_declaration_list_opt nsleave Trbrace Tsemi  (99)
+	struct_declaration_list_opt : .  (105)
+
+	.  reduce 105
+
+	struct_declaration_list_opt  goto 144
+
+
+state 94
+	composite_type_decl : Tunion sue_identifier Tlbrace nsenter . struct_declaration_list_opt nsleave Trbrace Tsemi  (100)
+	struct_declaration_list_opt : .  (105)
+
+	.  reduce 105
+
+	struct_declaration_list_opt  goto 145
+
+
+state 95
+	enumerator : Tidentifier .  (103)
+	enumerator : Tidentifier . Teq constant_expression  (104)
+
+	Teq  shift 146
+	Tcomma  reduce 103
+	Trbrace  reduce 103
+
+
+state 96
+	composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list . Trbrace Tsemi  (97)
+	composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list . Tcomma Trbrace Tsemi  (98)
+	enumerator_list : enumerator_list . Tcomma enumerator  (102)
+
+	Tcomma  shift 147
+	Trbrace  shift 148
+	.  error
+
+
+state 97
+	enumerator_list : enumerator .  (101)
+
+	.  reduce 101
+
+
+state 98
+	pointer : Tstar typequalifiers pointer .  (29)
+
+	.  reduce 29
+
+
+state 99
+	direct_declarator : Tlparen declarator Trparen .  (31)
+
+	.  reduce 31
+
+
+state 100
+	primary_expression : Tidentifier .  (205)
+
+	.  reduce 205
+
+
+state 101
+	constant : Tenum_const .  (218)
+
+	.  reduce 218
+
+
+state 102
+	constant : Tcharacter_cst .  (216)
+
+	.  reduce 216
+
+
+state 103
+	constant : Tinteger_cst .  (215)
+
+	.  reduce 215
+
+
+state 104
+	constant : Tfloating_cst .  (214)
+
+	.  reduce 214
+
+
+state 105
+	constant : Tstring_literal .  (217)
+
+	.  reduce 217
+
+
+state 106
+	unary_expression : Tsizeof . unary_expression  (196)
+	unary_expression : Tsizeof . Tlparen itypename Trparen  (197)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 149
+	.  error
+
+	unary_expression  goto 150
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 107
+	unary_expression : Tplusplus . unary_expression  (188)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 151
+	.  error
+
+	unary_expression  goto 152
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 108
+	unary_expression : Tminusminus . unary_expression  (189)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 151
+	.  error
+
+	unary_expression  goto 153
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 109
+	unary_expression : Tamp . cast_expression  (194)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 155
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 110
+	unary_expression : Ttilde . cast_expression  (192)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 156
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 111
+	unary_expression : Tbang . cast_expression  (193)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 157
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 112
+	unary_expression : Tplus . cast_expression  (190)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 158
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 113
+	unary_expression : Tminus . cast_expression  (191)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 159
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 114
+	unary_expression : Tstar . cast_expression  (195)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 160
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 115
+	init : Tlbrace . init_list Trbrace  (19)
+	init : Tlbrace . init_list Tcomma Trbrace  (20)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 115
+	Tlparen  shift 116
+	.  error
+
+	init  goto 161
+	assignment_expression  goto 118
+	init_list  goto 162
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+116: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+116: shift/reduce conflict (shift 20, reduce 89) on Tchar
+116: shift/reduce conflict (shift 21, reduce 89) on Tshort
+116: shift/reduce conflict (shift 22, reduce 89) on Tint
+116: shift/reduce conflict (shift 23, reduce 89) on Tlong
+116: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+116: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+116: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+116: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+116: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+116: shift/reduce conflict (shift 29, reduce 89) on Tunion
+116: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 116
+	cast_expression : Tlparen . itypename Trparen cast_expression  (186)
+	primary_expression : Tlparen . expression Trparen  (207)
+	typequalifiers : .  (89)
+
+	Tidentifier  shift 100
+	Ttypedef_name  shift 19
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 163
+	assignment_expression  goto 164
+	typequalifiers  goto 32
+	itype_simple  goto 33
+	itypename  goto 165
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+	expression  goto 166
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 117
+	init_declarator : declarator Tasgn init .  (17)
+
+	.  reduce 17
+
+
+state 118
+	init : assignment_expression .  (18)
+
+	.  reduce 18
+
+
+state 119
+	assignment_expression : conditional_expression .  (142)
+
+	.  reduce 142
+
+
+state 120
+	assignment_expression : unary_expression . Tasgn expression  (143)
+	assignment_expression : unary_expression . Tmulasgn expression  (144)
+	assignment_expression : unary_expression . Tdivasgn expression  (145)
+	assignment_expression : unary_expression . Tmodasgn expression  (146)
+	assignment_expression : unary_expression . Taddasgn expression  (147)
+	assignment_expression : unary_expression . Tsubasgn expression  (148)
+	assignment_expression : unary_expression . Tlshiftasgn expression  (149)
+	assignment_expression : unary_expression . Trshiftasgn expression  (150)
+	assignment_expression : unary_expression . Tandasgn expression  (151)
+	assignment_expression : unary_expression . Txorasgn expression  (152)
+	assignment_expression : unary_expression . Torasgn expression  (153)
+	cast_expression : unary_expression .  (185)
+
+	Tdivasgn  shift 167
+	Tmodasgn  shift 168
+	Taddasgn  shift 169
+	Tsubasgn  shift 170
+	Tlshiftasgn  shift 171
+	Trshiftasgn  shift 172
+	Txorasgn  shift 173
+	Torasgn  shift 174
+	Tasgn  shift 175
+	Tmulasgn  shift 176
+	Tandasgn  shift 177
+	Tlshift  reduce 185
+	Trshift  reduce 185
+	Tle  reduce 185
+	Tge  reduce 185
+	Teq  reduce 185
+	Tne  reduce 185
+	Tseqand  reduce 185
+	Tseqor  reduce 185
+	Tcomma  reduce 185
+	Tquestion  reduce 185
+	Tcolon  reduce 185
+	Tor  reduce 185
+	Txor  reduce 185
+	Tamp  reduce 185
+	Tlt  reduce 185
+	Tgt  reduce 185
+	Tplus  reduce 185
+	Tminus  reduce 185
+	Tstar  reduce 185
+	Tdiv  reduce 185
+	Tmod  reduce 185
+	Trbrace  reduce 185
+	Trbracket  reduce 185
+	Trparen  reduce 185
+	Tsemi  reduce 185
+
+
+state 121
+	conditional_expression : logical_or_expression .  (154)
+	conditional_expression : logical_or_expression . Tquestion expression Tcolon conditional_expression  (155)
+	logical_or_expression : logical_or_expression . Tseqor logical_and_expression  (158)
+
+	Tseqor  shift 178
+	Tquestion  shift 179
+	Tcomma  reduce 154
+	Tcolon  reduce 154
+	Trbrace  reduce 154
+	Trbracket  reduce 154
+	Trparen  reduce 154
+	Tsemi  reduce 154
+
+
+state 122
+	logical_or_expression : logical_and_expression .  (157)
+	logical_and_expression : logical_and_expression . Tseqand inclusive_or_expression  (160)
+
+	Tseqand  shift 180
+	Tseqor  reduce 157
+	Tcomma  reduce 157
+	Tquestion  reduce 157
+	Tcolon  reduce 157
+	Trbrace  reduce 157
+	Trbracket  reduce 157
+	Trparen  reduce 157
+	Tsemi  reduce 157
+
+
+state 123
+	logical_and_expression : inclusive_or_expression .  (159)
+	inclusive_or_expression : inclusive_or_expression . Tor exclusive_or_expression  (162)
+
+	Tor  shift 181
+	Tseqand  reduce 159
+	Tseqor  reduce 159
+	Tcomma  reduce 159
+	Tquestion  reduce 159
+	Tcolon  reduce 159
+	Trbrace  reduce 159
+	Trbracket  reduce 159
+	Trparen  reduce 159
+	Tsemi  reduce 159
+
+
+state 124
+	inclusive_or_expression : exclusive_or_expression .  (161)
+	exclusive_or_expression : exclusive_or_expression . Txor and_expression  (164)
+
+	Txor  shift 182
+	Tseqand  reduce 161
+	Tseqor  reduce 161
+	Tcomma  reduce 161
+	Tquestion  reduce 161
+	Tcolon  reduce 161
+	Tor  reduce 161
+	Trbrace  reduce 161
+	Trbracket  reduce 161
+	Trparen  reduce 161
+	Tsemi  reduce 161
+
+
+state 125
+	exclusive_or_expression : and_expression .  (163)
+	and_expression : and_expression . Tamp equality_expression  (166)
+
+	Tamp  shift 183
+	Tseqand  reduce 163
+	Tseqor  reduce 163
+	Tcomma  reduce 163
+	Tquestion  reduce 163
+	Tcolon  reduce 163
+	Tor  reduce 163
+	Txor  reduce 163
+	Trbrace  reduce 163
+	Trbracket  reduce 163
+	Trparen  reduce 163
+	Tsemi  reduce 163
+
+
+state 126
+	and_expression : equality_expression .  (165)
+	equality_expression : equality_expression . Teq relation_expression  (168)
+	equality_expression : equality_expression . Tne relation_expression  (169)
+
+	Teq  shift 184
+	Tne  shift 185
+	Tseqand  reduce 165
+	Tseqor  reduce 165
+	Tcomma  reduce 165
+	Tquestion  reduce 165
+	Tcolon  reduce 165
+	Tor  reduce 165
+	Txor  reduce 165
+	Tamp  reduce 165
+	Trbrace  reduce 165
+	Trbracket  reduce 165
+	Trparen  reduce 165
+	Tsemi  reduce 165
+
+
+state 127
+	equality_expression : relation_expression .  (167)
+	relation_expression : relation_expression . Tlt shift_expression  (171)
+	relation_expression : relation_expression . Tgt shift_expression  (172)
+	relation_expression : relation_expression . Tle shift_expression  (173)
+	relation_expression : relation_expression . Tge shift_expression  (174)
+
+	Tle  shift 186
+	Tge  shift 187
+	Tlt  shift 188
+	Tgt  shift 189
+	Teq  reduce 167
+	Tne  reduce 167
+	Tseqand  reduce 167
+	Tseqor  reduce 167
+	Tcomma  reduce 167
+	Tquestion  reduce 167
+	Tcolon  reduce 167
+	Tor  reduce 167
+	Txor  reduce 167
+	Tamp  reduce 167
+	Trbrace  reduce 167
+	Trbracket  reduce 167
+	Trparen  reduce 167
+	Tsemi  reduce 167
+
+
+state 128
+	relation_expression : shift_expression .  (170)
+	shift_expression : shift_expression . Tlshift additive_expression  (176)
+	shift_expression : shift_expression . Trshift additive_expression  (177)
+
+	Tlshift  shift 190
+	Trshift  shift 191
+	Tle  reduce 170
+	Tge  reduce 170
+	Teq  reduce 170
+	Tne  reduce 170
+	Tseqand  reduce 170
+	Tseqor  reduce 170
+	Tcomma  reduce 170
+	Tquestion  reduce 170
+	Tcolon  reduce 170
+	Tor  reduce 170
+	Txor  reduce 170
+	Tamp  reduce 170
+	Tlt  reduce 170
+	Tgt  reduce 170
+	Trbrace  reduce 170
+	Trbracket  reduce 170
+	Trparen  reduce 170
+	Tsemi  reduce 170
+
+
+state 129
+	shift_expression : additive_expression .  (175)
+	additive_expression : additive_expression . Tplus multiplicative_expression  (179)
+	additive_expression : additive_expression . Tminus multiplicative_expression  (180)
+
+	Tplus  shift 192
+	Tminus  shift 193
+	Tlshift  reduce 175
+	Trshift  reduce 175
+	Tle  reduce 175
+	Tge  reduce 175
+	Teq  reduce 175
+	Tne  reduce 175
+	Tseqand  reduce 175
+	Tseqor  reduce 175
+	Tcomma  reduce 175
+	Tquestion  reduce 175
+	Tcolon  reduce 175
+	Tor  reduce 175
+	Txor  reduce 175
+	Tamp  reduce 175
+	Tlt  reduce 175
+	Tgt  reduce 175
+	Trbrace  reduce 175
+	Trbracket  reduce 175
+	Trparen  reduce 175
+	Tsemi  reduce 175
+
+
+state 130
+	additive_expression : multiplicative_expression .  (178)
+	multiplicative_expression : multiplicative_expression . Tstar cast_expression  (182)
+	multiplicative_expression : multiplicative_expression . Tdiv cast_expression  (183)
+	multiplicative_expression : multiplicative_expression . Tmod cast_expression  (184)
+
+	Tstar  shift 194
+	Tdiv  shift 195
+	Tmod  shift 196
+	Tlshift  reduce 178
+	Trshift  reduce 178
+	Tle  reduce 178
+	Tge  reduce 178
+	Teq  reduce 178
+	Tne  reduce 178
+	Tseqand  reduce 178
+	Tseqor  reduce 178
+	Tcomma  reduce 178
+	Tquestion  reduce 178
+	Tcolon  reduce 178
+	Tor  reduce 178
+	Txor  reduce 178
+	Tamp  reduce 178
+	Tlt  reduce 178
+	Tgt  reduce 178
+	Tplus  reduce 178
+	Tminus  reduce 178
+	Trbrace  reduce 178
+	Trbracket  reduce 178
+	Trparen  reduce 178
+	Tsemi  reduce 178
+
+
+state 131
+	multiplicative_expression : cast_expression .  (181)
+
+	.  reduce 181
+
+
+state 132
+	unary_expression : postfix_expression .  (187)
+	postfix_expression : postfix_expression . Tlbracket expression Trbracket  (199)
+	postfix_expression : postfix_expression . Tlparen argument_expression_list_opt Trparen  (200)
+	postfix_expression : postfix_expression . Tdo Tidentifier  (201)
+	postfix_expression : postfix_expression . Tarrow Tidentifier  (202)
+	postfix_expression : postfix_expression . Tplusplus  (203)
+	postfix_expression : postfix_expression . Tminusminus  (204)
+
+	Tarrow  shift 197
+	Tplusplus  shift 198
+	Tminusminus  shift 199
+	Tdo  shift 200
+	Tlbracket  shift 201
+	Tlparen  shift 202
+	Tlshift  reduce 187
+	Trshift  reduce 187
+	Tle  reduce 187
+	Tge  reduce 187
+	Teq  reduce 187
+	Tne  reduce 187
+	Tseqand  reduce 187
+	Tseqor  reduce 187
+	Tdivasgn  reduce 187
+	Tmodasgn  reduce 187
+	Taddasgn  reduce 187
+	Tsubasgn  reduce 187
+	Tlshiftasgn  reduce 187
+	Trshiftasgn  reduce 187
+	Txorasgn  reduce 187
+	Torasgn  reduce 187
+	Tcomma  reduce 187
+	Tasgn  reduce 187
+	Tquestion  reduce 187
+	Tcolon  reduce 187
+	Tor  reduce 187
+	Txor  reduce 187
+	Tamp  reduce 187
+	Tlt  reduce 187
+	Tgt  reduce 187
+	Tplus  reduce 187
+	Tminus  reduce 187
+	Tstar  reduce 187
+	Tdiv  reduce 187
+	Tmod  reduce 187
+	Trbrace  reduce 187
+	Trbracket  reduce 187
+	Trparen  reduce 187
+	Tsemi  reduce 187
+	Tmulasgn  reduce 187
+	Tandasgn  reduce 187
+
+
+state 133
+	postfix_expression : primary_expression .  (198)
+
+	.  reduce 198
+
+
+state 134
+	primary_expression : constant .  (206)
+
+	.  reduce 206
+
+
+state 135
+	init_declarator_list : init_declarator_list Tcomma init_declarator .  (15)
+
+	.  reduce 15
+
+
+state 136
+	function_definition : declaration_specifiers function_declarator Tlbrace nsreenter . blockitem_list_opt nsleave Trbrace  (21)
+	blockitem_list_opt : .  (124)
+
+	.  reduce 124
+
+	blockitem_list_opt  goto 203
+
+
+state 137
+	direct_declarator : direct_declarator Tlbracket Trbracket .  (32)
+
+	.  reduce 32
+
+
+state 138
+	direct_declarator : direct_declarator Tlbracket typequalifiers . assignment_expression Trbracket  (33)
+	typequalifiers : typequalifiers . typequalifier  (90)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Trestrict  shift 68
+	Tconst  shift 69
+	Tvolatile  shift 70
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 204
+	typequalifier  goto 72
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 139
+	function_direct_declarator : direct_declarator Tlparen Trparen .  (25)
+	direct_declarator : direct_declarator Tlparen Trparen .  (34)
+
+	Tcomma  reduce 34
+	Tasgn  reduce 34
+	Tlbrace  reduce 25
+	Tlbracket  reduce 34
+	Tlparen  reduce 34
+	Tsemi  reduce 34
+
+
+140: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+140: shift/reduce conflict (shift 20, reduce 89) on Tchar
+140: shift/reduce conflict (shift 21, reduce 89) on Tshort
+140: shift/reduce conflict (shift 22, reduce 89) on Tint
+140: shift/reduce conflict (shift 23, reduce 89) on Tlong
+140: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+140: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+140: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+140: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+140: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+140: shift/reduce conflict (shift 29, reduce 89) on Tunion
+140: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 140
+	function_direct_declarator : direct_declarator Tlparen nsenter . parameter_type_list nsleave Trparen  (24)
+	direct_declarator : direct_declarator Tlparen nsenter . parameter_type_list nsleave Trparen  (35)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 205
+	parameter_type_list  goto 206
+	typequalifiers  goto 32
+	parameter_list  goto 207
+	parameter_declaration  goto 208
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+
+
+state 141
+	inttype : Tunsigned Tlong Tlong Tint .  (74)
+
+	.  reduce 74
+
+
+state 142
+	direct_declarator : direct_declarator Tlparen Trparen .  (34)
+
+	.  reduce 34
+
+
+143: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+143: shift/reduce conflict (shift 20, reduce 89) on Tchar
+143: shift/reduce conflict (shift 21, reduce 89) on Tshort
+143: shift/reduce conflict (shift 22, reduce 89) on Tint
+143: shift/reduce conflict (shift 23, reduce 89) on Tlong
+143: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+143: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+143: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+143: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+143: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+143: shift/reduce conflict (shift 29, reduce 89) on Tunion
+143: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 143
+	direct_declarator : direct_declarator Tlparen nsenter . parameter_type_list nsleave Trparen  (35)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 205
+	parameter_type_list  goto 209
+	typequalifiers  goto 32
+	parameter_list  goto 207
+	parameter_declaration  goto 208
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+
+
+144: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+144: shift/reduce conflict (shift 20, reduce 89) on Tchar
+144: shift/reduce conflict (shift 21, reduce 89) on Tshort
+144: shift/reduce conflict (shift 22, reduce 89) on Tint
+144: shift/reduce conflict (shift 23, reduce 89) on Tlong
+144: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+144: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+144: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+144: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+144: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+144: shift/reduce conflict (shift 29, reduce 89) on Tunion
+144: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 144
+	composite_type_decl : Tstruct sue_identifier Tlbrace nsenter struct_declaration_list_opt . nsleave Trbrace Tsemi  (99)
+	struct_declaration_list_opt : struct_declaration_list_opt . struct_declaration  (106)
+	nsleave : .  (2)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+	Trbrace  reduce 2
+
+	nsleave  goto 210
+	itype  goto 211
+	typequalifiers  goto 32
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+	struct_declaration  goto 212
+
+
+145: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+145: shift/reduce conflict (shift 20, reduce 89) on Tchar
+145: shift/reduce conflict (shift 21, reduce 89) on Tshort
+145: shift/reduce conflict (shift 22, reduce 89) on Tint
+145: shift/reduce conflict (shift 23, reduce 89) on Tlong
+145: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+145: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+145: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+145: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+145: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+145: shift/reduce conflict (shift 29, reduce 89) on Tunion
+145: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 145
+	composite_type_decl : Tunion sue_identifier Tlbrace nsenter struct_declaration_list_opt . nsleave Trbrace Tsemi  (100)
+	struct_declaration_list_opt : struct_declaration_list_opt . struct_declaration  (106)
+	nsleave : .  (2)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+	Trbrace  reduce 2
+
+	nsleave  goto 213
+	itype  goto 211
+	typequalifiers  goto 32
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+	struct_declaration  goto 212
+
+
+state 146
+	enumerator : Tidentifier Teq . constant_expression  (104)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	constant_expression  goto 214
+	conditional_expression  goto 215
+	unary_expression  goto 154
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 147
+	composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list Tcomma . Trbrace Tsemi  (98)
+	enumerator_list : enumerator_list Tcomma . enumerator  (102)
+
+	Tidentifier  shift 95
+	Trbrace  shift 216
+	.  error
+
+	enumerator  goto 217
+
+
+state 148
+	composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list Trbrace . Tsemi  (97)
+
+	Tsemi  shift 218
+	.  error
+
+
+149: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+149: shift/reduce conflict (shift 20, reduce 89) on Tchar
+149: shift/reduce conflict (shift 21, reduce 89) on Tshort
+149: shift/reduce conflict (shift 22, reduce 89) on Tint
+149: shift/reduce conflict (shift 23, reduce 89) on Tlong
+149: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+149: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+149: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+149: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+149: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+149: shift/reduce conflict (shift 29, reduce 89) on Tunion
+149: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 149
+	unary_expression : Tsizeof Tlparen . itypename Trparen  (197)
+	primary_expression : Tlparen . expression Trparen  (207)
+	typequalifiers : .  (89)
+
+	Tidentifier  shift 100
+	Ttypedef_name  shift 19
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 163
+	assignment_expression  goto 164
+	typequalifiers  goto 32
+	itype_simple  goto 33
+	itypename  goto 219
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+	expression  goto 166
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 150
+	unary_expression : Tsizeof unary_expression .  (196)
+
+	.  reduce 196
+
+
+state 151
+	primary_expression : Tlparen . expression Trparen  (207)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 166
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 152
+	unary_expression : Tplusplus unary_expression .  (188)
+
+	.  reduce 188
+
+
+state 153
+	unary_expression : Tminusminus unary_expression .  (189)
+
+	.  reduce 189
+
+
+state 154
+	cast_expression : unary_expression .  (185)
+
+	.  reduce 185
+
+
+state 155
+	unary_expression : Tamp cast_expression .  (194)
+
+	.  reduce 194
+
+
+state 156
+	unary_expression : Ttilde cast_expression .  (192)
+
+	.  reduce 192
+
+
+state 157
+	unary_expression : Tbang cast_expression .  (193)
+
+	.  reduce 193
+
+
+state 158
+	unary_expression : Tplus cast_expression .  (190)
+
+	.  reduce 190
+
+
+state 159
+	unary_expression : Tminus cast_expression .  (191)
+
+	.  reduce 191
+
+
+state 160
+	unary_expression : Tstar cast_expression .  (195)
+
+	.  reduce 195
+
+
+state 161
+	init_list : init .  (54)
+
+	.  reduce 54
+
+
+state 162
+	init : Tlbrace init_list . Trbrace  (19)
+	init : Tlbrace init_list . Tcomma Trbrace  (20)
+	init_list : init_list . Tcomma init  (55)
+
+	Tcomma  shift 220
+	Trbrace  shift 221
+	.  error
+
+
+state 163
+	itypename : itype . abstract_declarator_opt  (58)
+	abstract_declarator_opt : .  (36)
+
+	Tstar  shift 44
+	Tlbracket  shift 222
+	Tlparen  shift 223
+	Trparen  reduce 36
+
+	pointer  goto 224
+	abstract_declarator_opt  goto 225
+	abstract_declarator  goto 226
+	direct_abstract_declarator  goto 227
+
+
+state 164
+	expression : assignment_expression .  (140)
+
+	.  reduce 140
+
+
+state 165
+	cast_expression : Tlparen itypename . Trparen cast_expression  (186)
+
+	Trparen  shift 228
+	.  error
+
+
+state 166
+	expression : expression . Tcomma assignment_expression  (141)
+	primary_expression : Tlparen expression . Trparen  (207)
+
+	Tcomma  shift 229
+	Trparen  shift 230
+	.  error
+
+
+state 167
+	assignment_expression : unary_expression Tdivasgn . expression  (145)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 231
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 168
+	assignment_expression : unary_expression Tmodasgn . expression  (146)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 232
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 169
+	assignment_expression : unary_expression Taddasgn . expression  (147)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 233
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 170
+	assignment_expression : unary_expression Tsubasgn . expression  (148)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 234
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 171
+	assignment_expression : unary_expression Tlshiftasgn . expression  (149)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 235
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 172
+	assignment_expression : unary_expression Trshiftasgn . expression  (150)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 236
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 173
+	assignment_expression : unary_expression Txorasgn . expression  (152)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 237
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 174
+	assignment_expression : unary_expression Torasgn . expression  (153)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 238
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 175
+	assignment_expression : unary_expression Tasgn . expression  (143)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 239
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 176
+	assignment_expression : unary_expression Tmulasgn . expression  (144)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 240
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 177
+	assignment_expression : unary_expression Tandasgn . expression  (151)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 241
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 178
+	logical_or_expression : logical_or_expression Tseqor . logical_and_expression  (158)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	logical_and_expression  goto 242
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 179
+	conditional_expression : logical_or_expression Tquestion . expression Tcolon conditional_expression  (155)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 243
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 180
+	logical_and_expression : logical_and_expression Tseqand . inclusive_or_expression  (160)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	inclusive_or_expression  goto 244
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 181
+	inclusive_or_expression : inclusive_or_expression Tor . exclusive_or_expression  (162)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	exclusive_or_expression  goto 245
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 182
+	exclusive_or_expression : exclusive_or_expression Txor . and_expression  (164)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	and_expression  goto 246
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 183
+	and_expression : and_expression Tamp . equality_expression  (166)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	equality_expression  goto 247
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 184
+	equality_expression : equality_expression Teq . relation_expression  (168)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	relation_expression  goto 248
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 185
+	equality_expression : equality_expression Tne . relation_expression  (169)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	relation_expression  goto 249
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 186
+	relation_expression : relation_expression Tle . shift_expression  (173)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	shift_expression  goto 250
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 187
+	relation_expression : relation_expression Tge . shift_expression  (174)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	shift_expression  goto 251
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 188
+	relation_expression : relation_expression Tlt . shift_expression  (171)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	shift_expression  goto 252
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 189
+	relation_expression : relation_expression Tgt . shift_expression  (172)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	shift_expression  goto 253
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 190
+	shift_expression : shift_expression Tlshift . additive_expression  (176)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	additive_expression  goto 254
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 191
+	shift_expression : shift_expression Trshift . additive_expression  (177)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	additive_expression  goto 255
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 192
+	additive_expression : additive_expression Tplus . multiplicative_expression  (179)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	multiplicative_expression  goto 256
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 193
+	additive_expression : additive_expression Tminus . multiplicative_expression  (180)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	multiplicative_expression  goto 257
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 194
+	multiplicative_expression : multiplicative_expression Tstar . cast_expression  (182)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 258
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 195
+	multiplicative_expression : multiplicative_expression Tdiv . cast_expression  (183)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 259
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 196
+	multiplicative_expression : multiplicative_expression Tmod . cast_expression  (184)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 260
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 197
+	postfix_expression : postfix_expression Tarrow . Tidentifier  (202)
+
+	Tidentifier  shift 261
+	.  error
+
+
+state 198
+	postfix_expression : postfix_expression Tplusplus .  (203)
+
+	.  reduce 203
+
+
+state 199
+	postfix_expression : postfix_expression Tminusminus .  (204)
+
+	.  reduce 204
+
+
+state 200
+	postfix_expression : postfix_expression Tdo . Tidentifier  (201)
+
+	Tidentifier  shift 262
+	.  error
+
+
+state 201
+	postfix_expression : postfix_expression Tlbracket . expression Trbracket  (199)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 263
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 202
+	postfix_expression : postfix_expression Tlparen . argument_expression_list_opt Trparen  (200)
+	argument_expression_list_opt : .  (208)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Trparen  reduce 208
+
+	assignment_expression  goto 264
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	argument_expression_list_opt  goto 265
+	constant  goto 134
+	argument_expression_list  goto 266
+
+
+203: shift/reduce conflict (shift 268, reduce 91) on Ttypedef_name
+203: shift/reduce conflict (shift 9, reduce 91) on Tstruct
+203: shift/reduce conflict (shift 10, reduce 91) on Tunion
+203: shift/reduce conflict (shift 11, reduce 91) on Tenum
+state 203
+	function_definition : declaration_specifiers function_declarator Tlbrace nsreenter blockitem_list_opt . nsleave Trbrace  (21)
+	blockitem_list_opt : blockitem_list_opt . declaration  (125)
+	blockitem_list_opt : blockitem_list_opt . statement  (126)
+	nsleave : .  (2)
+	storage_class_specifier : .  (91)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Ttypedef  shift 6
+	Textern  shift 7
+	Tstatic  shift 8
+	Tstruct  shift 9
+	Tunion  shift 10
+	Tenum  shift 11
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Trestrict  reduce 91
+	Tchar  reduce 91
+	Tshort  reduce 91
+	Tint  reduce 91
+	Tlong  reduce 91
+	Tunsigned  reduce 91
+	Tfloat  reduce 91
+	Tdouble  reduce 91
+	Tconst  reduce 91
+	Tvolatile  reduce 91
+	Tvoid  reduce 91
+	Trbrace  reduce 2
+	Tsemi  reduce 128
+
+	nsleave  goto 282
+	declaration  goto 283
+	declaration_specifiers  goto 284
+	storage_class_specifier  goto 17
+	composite_type_decl  goto 18
+	assignment_expression  goto 164
+	statement  goto 285
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 204
+	direct_declarator : direct_declarator Tlbracket typequalifiers assignment_expression . Trbracket  (33)
+
+	Trbracket  shift 295
+	.  error
+
+
+state 205
+	parameter_declaration : itype . declarator  (52)
+	parameter_declaration : itype . abstract_declarator_opt  (53)
+	abstract_declarator_opt : .  (36)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlbracket  shift 222
+	Tlparen  shift 296
+	Tcomma  reduce 36
+	Trparen  reduce 36
+
+	declarator  goto 297
+	pointer  goto 298
+	direct_declarator  goto 67
+	abstract_declarator_opt  goto 299
+	abstract_declarator  goto 226
+	direct_abstract_declarator  goto 227
+
+
+state 206
+	function_direct_declarator : direct_declarator Tlparen nsenter parameter_type_list . nsleave Trparen  (24)
+	direct_declarator : direct_declarator Tlparen nsenter parameter_type_list . nsleave Trparen  (35)
+	nsleave : .  (2)
+
+	.  reduce 2
+
+	nsleave  goto 300
+
+
+state 207
+	parameter_type_list : parameter_list .  (48)
+	parameter_type_list : parameter_list . Tcomma Tellipsis  (49)
+	parameter_list : parameter_list . Tcomma parameter_declaration  (51)
+
+	Tcomma  shift 301
+	Trparen  reduce 48
+
+
+state 208
+	parameter_list : parameter_declaration .  (50)
+
+	.  reduce 50
+
+
+state 209
+	direct_declarator : direct_declarator Tlparen nsenter parameter_type_list . nsleave Trparen  (35)
+	nsleave : .  (2)
+
+	.  reduce 2
+
+	nsleave  goto 302
+
+
+state 210
+	composite_type_decl : Tstruct sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave . Trbrace Tsemi  (99)
+
+	Trbrace  shift 303
+	.  error
+
+
+state 211
+	struct_declaration : itype . struct_declarator_list Tsemi  (107)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlparen  shift 45
+	.  error
+
+	declarator  goto 304
+	pointer  goto 66
+	direct_declarator  goto 67
+	struct_declarator_list  goto 305
+	struct_declarator  goto 306
+
+
+state 212
+	struct_declaration_list_opt : struct_declaration_list_opt struct_declaration .  (106)
+
+	.  reduce 106
+
+
+state 213
+	composite_type_decl : Tunion sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave . Trbrace Tsemi  (100)
+
+	Trbrace  shift 307
+	.  error
+
+
+state 214
+	enumerator : Tidentifier Teq constant_expression .  (104)
+
+	.  reduce 104
+
+
+state 215
+	constant_expression : conditional_expression .  (156)
+
+	.  reduce 156
+
+
+state 216
+	composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list Tcomma Trbrace . Tsemi  (98)
+
+	Tsemi  shift 308
+	.  error
+
+
+state 217
+	enumerator_list : enumerator_list Tcomma enumerator .  (102)
+
+	.  reduce 102
+
+
+state 218
+	composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list Trbrace Tsemi .  (97)
+
+	.  reduce 97
+
+
+state 219
+	unary_expression : Tsizeof Tlparen itypename . Trparen  (197)
+
+	Trparen  shift 309
+	.  error
+
+
+state 220
+	init : Tlbrace init_list Tcomma . Trbrace  (20)
+	init_list : init_list Tcomma . init  (55)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 115
+	Trbrace  shift 310
+	Tlparen  shift 116
+	.  error
+
+	init  goto 311
+	assignment_expression  goto 118
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 221
+	init : Tlbrace init_list Trbrace .  (19)
+
+	.  reduce 19
+
+
+state 222
+	direct_abstract_declarator : Tlbracket . assignment_expression_opt Trbracket  (42)
+	assignment_expression_opt : .  (212)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Trbracket  reduce 212
+
+	assignment_expression  goto 312
+	assignment_expression_opt  goto 313
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 223
+	direct_abstract_declarator : Tlparen . abstract_declarator Trparen  (41)
+	direct_abstract_declarator : Tlparen . Trparen  (44)
+	direct_abstract_declarator : Tlparen . nsenter parameter_type_list nsleave Trparen  (45)
+	nsenter : .  (1)
+
+	Tstar  shift 44
+	Tlbracket  shift 222
+	Tlparen  shift 223
+	Trparen  shift 314
+	Ttypedef_name  reduce 1
+	Trestrict  reduce 1
+	Tchar  reduce 1
+	Tshort  reduce 1
+	Tint  reduce 1
+	Tlong  reduce 1
+	Tunsigned  reduce 1
+	Tfloat  reduce 1
+	Tdouble  reduce 1
+	Tconst  reduce 1
+	Tvolatile  reduce 1
+	Tvoid  reduce 1
+	Tstruct  reduce 1
+	Tunion  reduce 1
+	Tenum  reduce 1
+
+	nsenter  goto 315
+	pointer  goto 224
+	abstract_declarator  goto 316
+	direct_abstract_declarator  goto 227
+
+
+state 224
+	abstract_declarator : pointer .  (38)
+	abstract_declarator : pointer . direct_abstract_declarator  (40)
+
+	Tlbracket  shift 222
+	Tlparen  shift 223
+	Trparen  reduce 38
+
+	direct_abstract_declarator  goto 317
+
+
+state 225
+	itypename : itype abstract_declarator_opt .  (58)
+
+	.  reduce 58
+
+
+state 226
+	abstract_declarator_opt : abstract_declarator .  (37)
+
+	.  reduce 37
+
+
+state 227
+	abstract_declarator : direct_abstract_declarator .  (39)
+	direct_abstract_declarator : direct_abstract_declarator . Tlbracket assignment_expression_opt Trbracket  (43)
+	direct_abstract_declarator : direct_abstract_declarator . Tlparen Trparen  (46)
+	direct_abstract_declarator : direct_abstract_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (47)
+
+	Tlbracket  shift 318
+	Tlparen  shift 319
+	Tcomma  reduce 39
+	Trparen  reduce 39
+
+
+state 228
+	cast_expression : Tlparen itypename Trparen . cast_expression  (186)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	unary_expression  goto 154
+	cast_expression  goto 320
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 229
+	expression : expression Tcomma . assignment_expression  (141)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 321
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 230
+	primary_expression : Tlparen expression Trparen .  (207)
+
+	.  reduce 207
+
+
+state 231
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Tdivasgn expression .  (145)
+
+	.  reduce 145
+
+
+state 232
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Tmodasgn expression .  (146)
+
+	.  reduce 146
+
+
+state 233
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Taddasgn expression .  (147)
+
+	.  reduce 147
+
+
+state 234
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Tsubasgn expression .  (148)
+
+	.  reduce 148
+
+
+state 235
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Tlshiftasgn expression .  (149)
+
+	.  reduce 149
+
+
+state 236
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Trshiftasgn expression .  (150)
+
+	.  reduce 150
+
+
+state 237
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Txorasgn expression .  (152)
+
+	.  reduce 152
+
+
+state 238
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Torasgn expression .  (153)
+
+	.  reduce 153
+
+
+state 239
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Tasgn expression .  (143)
+
+	.  reduce 143
+
+
+state 240
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Tmulasgn expression .  (144)
+
+	.  reduce 144
+
+
+state 241
+	expression : expression . Tcomma assignment_expression  (141)
+	assignment_expression : unary_expression Tandasgn expression .  (151)
+
+	.  reduce 151
+
+
+state 242
+	logical_or_expression : logical_or_expression Tseqor logical_and_expression .  (158)
+	logical_and_expression : logical_and_expression . Tseqand inclusive_or_expression  (160)
+
+	Tseqand  shift 180
+	Tseqor  reduce 158
+	Tcomma  reduce 158
+	Tquestion  reduce 158
+	Tcolon  reduce 158
+	Trbrace  reduce 158
+	Trbracket  reduce 158
+	Trparen  reduce 158
+	Tsemi  reduce 158
+
+
+state 243
+	expression : expression . Tcomma assignment_expression  (141)
+	conditional_expression : logical_or_expression Tquestion expression . Tcolon conditional_expression  (155)
+
+	Tcomma  shift 229
+	Tcolon  shift 322
+	.  error
+
+
+state 244
+	logical_and_expression : logical_and_expression Tseqand inclusive_or_expression .  (160)
+	inclusive_or_expression : inclusive_or_expression . Tor exclusive_or_expression  (162)
+
+	Tor  shift 181
+	Tseqand  reduce 160
+	Tseqor  reduce 160
+	Tcomma  reduce 160
+	Tquestion  reduce 160
+	Tcolon  reduce 160
+	Trbrace  reduce 160
+	Trbracket  reduce 160
+	Trparen  reduce 160
+	Tsemi  reduce 160
+
+
+state 245
+	inclusive_or_expression : inclusive_or_expression Tor exclusive_or_expression .  (162)
+	exclusive_or_expression : exclusive_or_expression . Txor and_expression  (164)
+
+	Txor  shift 182
+	Tseqand  reduce 162
+	Tseqor  reduce 162
+	Tcomma  reduce 162
+	Tquestion  reduce 162
+	Tcolon  reduce 162
+	Tor  reduce 162
+	Trbrace  reduce 162
+	Trbracket  reduce 162
+	Trparen  reduce 162
+	Tsemi  reduce 162
+
+
+state 246
+	exclusive_or_expression : exclusive_or_expression Txor and_expression .  (164)
+	and_expression : and_expression . Tamp equality_expression  (166)
+
+	Tamp  shift 183
+	Tseqand  reduce 164
+	Tseqor  reduce 164
+	Tcomma  reduce 164
+	Tquestion  reduce 164
+	Tcolon  reduce 164
+	Tor  reduce 164
+	Txor  reduce 164
+	Trbrace  reduce 164
+	Trbracket  reduce 164
+	Trparen  reduce 164
+	Tsemi  reduce 164
+
+
+state 247
+	and_expression : and_expression Tamp equality_expression .  (166)
+	equality_expression : equality_expression . Teq relation_expression  (168)
+	equality_expression : equality_expression . Tne relation_expression  (169)
+
+	Teq  shift 184
+	Tne  shift 185
+	Tseqand  reduce 166
+	Tseqor  reduce 166
+	Tcomma  reduce 166
+	Tquestion  reduce 166
+	Tcolon  reduce 166
+	Tor  reduce 166
+	Txor  reduce 166
+	Tamp  reduce 166
+	Trbrace  reduce 166
+	Trbracket  reduce 166
+	Trparen  reduce 166
+	Tsemi  reduce 166
+
+
+state 248
+	equality_expression : equality_expression Teq relation_expression .  (168)
+	relation_expression : relation_expression . Tlt shift_expression  (171)
+	relation_expression : relation_expression . Tgt shift_expression  (172)
+	relation_expression : relation_expression . Tle shift_expression  (173)
+	relation_expression : relation_expression . Tge shift_expression  (174)
+
+	Tle  shift 186
+	Tge  shift 187
+	Tlt  shift 188
+	Tgt  shift 189
+	Teq  reduce 168
+	Tne  reduce 168
+	Tseqand  reduce 168
+	Tseqor  reduce 168
+	Tcomma  reduce 168
+	Tquestion  reduce 168
+	Tcolon  reduce 168
+	Tor  reduce 168
+	Txor  reduce 168
+	Tamp  reduce 168
+	Trbrace  reduce 168
+	Trbracket  reduce 168
+	Trparen  reduce 168
+	Tsemi  reduce 168
+
+
+state 249
+	equality_expression : equality_expression Tne relation_expression .  (169)
+	relation_expression : relation_expression . Tlt shift_expression  (171)
+	relation_expression : relation_expression . Tgt shift_expression  (172)
+	relation_expression : relation_expression . Tle shift_expression  (173)
+	relation_expression : relation_expression . Tge shift_expression  (174)
+
+	Tle  shift 186
+	Tge  shift 187
+	Tlt  shift 188
+	Tgt  shift 189
+	Teq  reduce 169
+	Tne  reduce 169
+	Tseqand  reduce 169
+	Tseqor  reduce 169
+	Tcomma  reduce 169
+	Tquestion  reduce 169
+	Tcolon  reduce 169
+	Tor  reduce 169
+	Txor  reduce 169
+	Tamp  reduce 169
+	Trbrace  reduce 169
+	Trbracket  reduce 169
+	Trparen  reduce 169
+	Tsemi  reduce 169
+
+
+state 250
+	relation_expression : relation_expression Tle shift_expression .  (173)
+	shift_expression : shift_expression . Tlshift additive_expression  (176)
+	shift_expression : shift_expression . Trshift additive_expression  (177)
+
+	Tlshift  shift 190
+	Trshift  shift 191
+	Tle  reduce 173
+	Tge  reduce 173
+	Teq  reduce 173
+	Tne  reduce 173
+	Tseqand  reduce 173
+	Tseqor  reduce 173
+	Tcomma  reduce 173
+	Tquestion  reduce 173
+	Tcolon  reduce 173
+	Tor  reduce 173
+	Txor  reduce 173
+	Tamp  reduce 173
+	Tlt  reduce 173
+	Tgt  reduce 173
+	Trbrace  reduce 173
+	Trbracket  reduce 173
+	Trparen  reduce 173
+	Tsemi  reduce 173
+
+
+state 251
+	relation_expression : relation_expression Tge shift_expression .  (174)
+	shift_expression : shift_expression . Tlshift additive_expression  (176)
+	shift_expression : shift_expression . Trshift additive_expression  (177)
+
+	Tlshift  shift 190
+	Trshift  shift 191
+	Tle  reduce 174
+	Tge  reduce 174
+	Teq  reduce 174
+	Tne  reduce 174
+	Tseqand  reduce 174
+	Tseqor  reduce 174
+	Tcomma  reduce 174
+	Tquestion  reduce 174
+	Tcolon  reduce 174
+	Tor  reduce 174
+	Txor  reduce 174
+	Tamp  reduce 174
+	Tlt  reduce 174
+	Tgt  reduce 174
+	Trbrace  reduce 174
+	Trbracket  reduce 174
+	Trparen  reduce 174
+	Tsemi  reduce 174
+
+
+state 252
+	relation_expression : relation_expression Tlt shift_expression .  (171)
+	shift_expression : shift_expression . Tlshift additive_expression  (176)
+	shift_expression : shift_expression . Trshift additive_expression  (177)
+
+	Tlshift  shift 190
+	Trshift  shift 191
+	Tle  reduce 171
+	Tge  reduce 171
+	Teq  reduce 171
+	Tne  reduce 171
+	Tseqand  reduce 171
+	Tseqor  reduce 171
+	Tcomma  reduce 171
+	Tquestion  reduce 171
+	Tcolon  reduce 171
+	Tor  reduce 171
+	Txor  reduce 171
+	Tamp  reduce 171
+	Tlt  reduce 171
+	Tgt  reduce 171
+	Trbrace  reduce 171
+	Trbracket  reduce 171
+	Trparen  reduce 171
+	Tsemi  reduce 171
+
+
+state 253
+	relation_expression : relation_expression Tgt shift_expression .  (172)
+	shift_expression : shift_expression . Tlshift additive_expression  (176)
+	shift_expression : shift_expression . Trshift additive_expression  (177)
+
+	Tlshift  shift 190
+	Trshift  shift 191
+	Tle  reduce 172
+	Tge  reduce 172
+	Teq  reduce 172
+	Tne  reduce 172
+	Tseqand  reduce 172
+	Tseqor  reduce 172
+	Tcomma  reduce 172
+	Tquestion  reduce 172
+	Tcolon  reduce 172
+	Tor  reduce 172
+	Txor  reduce 172
+	Tamp  reduce 172
+	Tlt  reduce 172
+	Tgt  reduce 172
+	Trbrace  reduce 172
+	Trbracket  reduce 172
+	Trparen  reduce 172
+	Tsemi  reduce 172
+
+
+state 254
+	shift_expression : shift_expression Tlshift additive_expression .  (176)
+	additive_expression : additive_expression . Tplus multiplicative_expression  (179)
+	additive_expression : additive_expression . Tminus multiplicative_expression  (180)
+
+	Tplus  shift 192
+	Tminus  shift 193
+	Tlshift  reduce 176
+	Trshift  reduce 176
+	Tle  reduce 176
+	Tge  reduce 176
+	Teq  reduce 176
+	Tne  reduce 176
+	Tseqand  reduce 176
+	Tseqor  reduce 176
+	Tcomma  reduce 176
+	Tquestion  reduce 176
+	Tcolon  reduce 176
+	Tor  reduce 176
+	Txor  reduce 176
+	Tamp  reduce 176
+	Tlt  reduce 176
+	Tgt  reduce 176
+	Trbrace  reduce 176
+	Trbracket  reduce 176
+	Trparen  reduce 176
+	Tsemi  reduce 176
+
+
+state 255
+	shift_expression : shift_expression Trshift additive_expression .  (177)
+	additive_expression : additive_expression . Tplus multiplicative_expression  (179)
+	additive_expression : additive_expression . Tminus multiplicative_expression  (180)
+
+	Tplus  shift 192
+	Tminus  shift 193
+	Tlshift  reduce 177
+	Trshift  reduce 177
+	Tle  reduce 177
+	Tge  reduce 177
+	Teq  reduce 177
+	Tne  reduce 177
+	Tseqand  reduce 177
+	Tseqor  reduce 177
+	Tcomma  reduce 177
+	Tquestion  reduce 177
+	Tcolon  reduce 177
+	Tor  reduce 177
+	Txor  reduce 177
+	Tamp  reduce 177
+	Tlt  reduce 177
+	Tgt  reduce 177
+	Trbrace  reduce 177
+	Trbracket  reduce 177
+	Trparen  reduce 177
+	Tsemi  reduce 177
+
+
+state 256
+	additive_expression : additive_expression Tplus multiplicative_expression .  (179)
+	multiplicative_expression : multiplicative_expression . Tstar cast_expression  (182)
+	multiplicative_expression : multiplicative_expression . Tdiv cast_expression  (183)
+	multiplicative_expression : multiplicative_expression . Tmod cast_expression  (184)
+
+	Tstar  shift 194
+	Tdiv  shift 195
+	Tmod  shift 196
+	Tlshift  reduce 179
+	Trshift  reduce 179
+	Tle  reduce 179
+	Tge  reduce 179
+	Teq  reduce 179
+	Tne  reduce 179
+	Tseqand  reduce 179
+	Tseqor  reduce 179
+	Tcomma  reduce 179
+	Tquestion  reduce 179
+	Tcolon  reduce 179
+	Tor  reduce 179
+	Txor  reduce 179
+	Tamp  reduce 179
+	Tlt  reduce 179
+	Tgt  reduce 179
+	Tplus  reduce 179
+	Tminus  reduce 179
+	Trbrace  reduce 179
+	Trbracket  reduce 179
+	Trparen  reduce 179
+	Tsemi  reduce 179
+
+
+state 257
+	additive_expression : additive_expression Tminus multiplicative_expression .  (180)
+	multiplicative_expression : multiplicative_expression . Tstar cast_expression  (182)
+	multiplicative_expression : multiplicative_expression . Tdiv cast_expression  (183)
+	multiplicative_expression : multiplicative_expression . Tmod cast_expression  (184)
+
+	Tstar  shift 194
+	Tdiv  shift 195
+	Tmod  shift 196
+	Tlshift  reduce 180
+	Trshift  reduce 180
+	Tle  reduce 180
+	Tge  reduce 180
+	Teq  reduce 180
+	Tne  reduce 180
+	Tseqand  reduce 180
+	Tseqor  reduce 180
+	Tcomma  reduce 180
+	Tquestion  reduce 180
+	Tcolon  reduce 180
+	Tor  reduce 180
+	Txor  reduce 180
+	Tamp  reduce 180
+	Tlt  reduce 180
+	Tgt  reduce 180
+	Tplus  reduce 180
+	Tminus  reduce 180
+	Trbrace  reduce 180
+	Trbracket  reduce 180
+	Trparen  reduce 180
+	Tsemi  reduce 180
+
+
+state 258
+	multiplicative_expression : multiplicative_expression Tstar cast_expression .  (182)
+
+	.  reduce 182
+
+
+state 259
+	multiplicative_expression : multiplicative_expression Tdiv cast_expression .  (183)
+
+	.  reduce 183
+
+
+state 260
+	multiplicative_expression : multiplicative_expression Tmod cast_expression .  (184)
+
+	.  reduce 184
+
+
+state 261
+	postfix_expression : postfix_expression Tarrow Tidentifier .  (202)
+
+	.  reduce 202
+
+
+state 262
+	postfix_expression : postfix_expression Tdo Tidentifier .  (201)
+
+	.  reduce 201
+
+
+state 263
+	expression : expression . Tcomma assignment_expression  (141)
+	postfix_expression : postfix_expression Tlbracket expression . Trbracket  (199)
+
+	Tcomma  shift 229
+	Trbracket  shift 323
+	.  error
+
+
+state 264
+	argument_expression_list : assignment_expression .  (210)
+
+	.  reduce 210
+
+
+state 265
+	postfix_expression : postfix_expression Tlparen argument_expression_list_opt . Trparen  (200)
+
+	Trparen  shift 324
+	.  error
+
+
+state 266
+	argument_expression_list_opt : argument_expression_list .  (209)
+	argument_expression_list : argument_expression_list . Tcomma assignment_expression  (211)
+
+	Tcomma  shift 325
+	Trparen  reduce 209
+
+
+state 267
+	label : Tidentifier .  (120)
+	primary_expression : Tidentifier .  (205)
+
+	Tarrow  reduce 205
+	Tplusplus  reduce 205
+	Tminusminus  reduce 205
+	Tlshift  reduce 205
+	Trshift  reduce 205
+	Tle  reduce 205
+	Tge  reduce 205
+	Teq  reduce 205
+	Tne  reduce 205
+	Tseqand  reduce 205
+	Tseqor  reduce 205
+	Tdivasgn  reduce 205
+	Tmodasgn  reduce 205
+	Taddasgn  reduce 205
+	Tsubasgn  reduce 205
+	Tlshiftasgn  reduce 205
+	Trshiftasgn  reduce 205
+	Txorasgn  reduce 205
+	Torasgn  reduce 205
+	Tdo  reduce 205
+	Tcomma  reduce 205
+	Tasgn  reduce 205
+	Tquestion  reduce 205
+	Tcolon  reduce 120
+	Tor  reduce 205
+	Txor  reduce 205
+	Tamp  reduce 205
+	Tlt  reduce 205
+	Tgt  reduce 205
+	Tplus  reduce 205
+	Tminus  reduce 205
+	Tstar  reduce 205
+	Tdiv  reduce 205
+	Tmod  reduce 205
+	Tlbracket  reduce 205
+	Tlparen  reduce 205
+	Tsemi  reduce 205
+	Tmulasgn  reduce 205
+	Tandasgn  reduce 205
+
+
+state 268
+	label : Ttypedef_name .  (121)
+
+	.  reduce 121
+
+
+state 269
+	label : Tenum_const .  (122)
+	constant : Tenum_const .  (218)
+
+	Tarrow  reduce 218
+	Tplusplus  reduce 218
+	Tminusminus  reduce 218
+	Tlshift  reduce 218
+	Trshift  reduce 218
+	Tle  reduce 218
+	Tge  reduce 218
+	Teq  reduce 218
+	Tne  reduce 218
+	Tseqand  reduce 218
+	Tseqor  reduce 218
+	Tdivasgn  reduce 218
+	Tmodasgn  reduce 218
+	Taddasgn  reduce 218
+	Tsubasgn  reduce 218
+	Tlshiftasgn  reduce 218
+	Trshiftasgn  reduce 218
+	Txorasgn  reduce 218
+	Torasgn  reduce 218
+	Tdo  reduce 218
+	Tcomma  reduce 218
+	Tasgn  reduce 218
+	Tquestion  reduce 218
+	Tcolon  reduce 122
+	Tor  reduce 218
+	Txor  reduce 218
+	Tamp  reduce 218
+	Tlt  reduce 218
+	Tgt  reduce 218
+	Tplus  reduce 218
+	Tminus  reduce 218
+	Tstar  reduce 218
+	Tdiv  reduce 218
+	Tmod  reduce 218
+	Tlbracket  reduce 218
+	Tlparen  reduce 218
+	Tsemi  reduce 218
+	Tmulasgn  reduce 218
+	Tandasgn  reduce 218
+
+
+state 270
+	labeled_statement : Tcase . constant_expression Tcolon statement  (118)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	constant_expression  goto 326
+	conditional_expression  goto 215
+	unary_expression  goto 154
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 271
+	labeled_statement : Tdefault . Tcolon statement  (119)
+
+	Tcolon  shift 327
+	.  error
+
+
+state 272
+	selection_statement : Tif . Tlparen expression Trparen statement  (130)
+	selection_statement : Tif . Tlparen expression Trparen statement Telse statement  (131)
+
+	Tlparen  shift 328
+	.  error
+
+
+state 273
+	selection_statement : Tswitch . Tlparen expression Trparen statement  (132)
+
+	Tlparen  shift 329
+	.  error
+
+
+state 274
+	iteration_statement : Twhile . Tlparen expression Trparen statement  (133)
+
+	Tlparen  shift 330
+	.  error
+
+
+state 275
+	iteration_statement : Tdo . statement Twhile Tlparen expression Trparen Tsemi  (134)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 331
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 276
+	iteration_statement : Tfor . Tlparen expression_opt Tsemi expression_opt Tsemi expression_opt Trparen statement  (135)
+
+	Tlparen  shift 332
+	.  error
+
+
+state 277
+	jump_statement : Tgoto . label Tsemi  (136)
+
+	Tidentifier  shift 333
+	Ttypedef_name  shift 268
+	Tenum_const  shift 334
+	.  error
+
+	label  goto 335
+
+
+state 278
+	jump_statement : Tcontinue . Tsemi  (137)
+
+	Tsemi  shift 336
+	.  error
+
+
+state 279
+	jump_statement : Tbreak . Tsemi  (138)
+
+	Tsemi  shift 337
+	.  error
+
+
+state 280
+	jump_statement : Treturn . expression_opt Tsemi  (139)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	expression_opt  goto 338
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 281
+	compound_statement : Tlbrace . nsenter blockitem_list_opt nsleave Trbrace  (123)
+	nsenter : .  (1)
+
+	.  reduce 1
+
+	nsenter  goto 339
+
+
+state 282
+	function_definition : declaration_specifiers function_declarator Tlbrace nsreenter blockitem_list_opt nsleave . Trbrace  (21)
+
+	Trbrace  shift 340
+	.  error
+
+
+state 283
+	blockitem_list_opt : blockitem_list_opt declaration .  (125)
+
+	.  reduce 125
+
+
+state 284
+	declaration : declaration_specifiers . init_declarator_list Tsemi  (13)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlparen  shift 45
+	.  error
+
+	declarator  goto 46
+	init_declarator_list  goto 47
+	init_declarator  goto 48
+	pointer  goto 66
+	direct_declarator  goto 67
+
+
+state 285
+	blockitem_list_opt : blockitem_list_opt statement .  (126)
+
+	.  reduce 126
+
+
+state 286
+	statement : labeled_statement .  (111)
+
+	.  reduce 111
+
+
+state 287
+	statement : compound_statement .  (112)
+
+	.  reduce 112
+
+
+state 288
+	statement : expression_statement .  (113)
+
+	.  reduce 113
+
+
+state 289
+	statement : selection_statement .  (114)
+
+	.  reduce 114
+
+
+state 290
+	statement : iteration_statement .  (115)
+
+	.  reduce 115
+
+
+state 291
+	statement : jump_statement .  (116)
+
+	.  reduce 116
+
+
+state 292
+	labeled_statement : label . Tcolon statement  (117)
+
+	Tcolon  shift 341
+	.  error
+
+
+state 293
+	expression_statement : expression_opt . Tsemi  (127)
+
+	Tsemi  shift 342
+	.  error
+
+
+state 294
+	expression_opt : expression .  (129)
+	expression : expression . Tcomma assignment_expression  (141)
+
+	Tcomma  shift 229
+	Trparen  reduce 129
+	Tsemi  reduce 129
+
+
+state 295
+	direct_declarator : direct_declarator Tlbracket typequalifiers assignment_expression Trbracket .  (33)
+
+	.  reduce 33
+
+
+state 296
+	direct_declarator : Tlparen . declarator Trparen  (31)
+	direct_abstract_declarator : Tlparen . abstract_declarator Trparen  (41)
+	direct_abstract_declarator : Tlparen . Trparen  (44)
+	direct_abstract_declarator : Tlparen . nsenter parameter_type_list nsleave Trparen  (45)
+	nsenter : .  (1)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlbracket  shift 222
+	Tlparen  shift 296
+	Trparen  shift 314
+	Ttypedef_name  reduce 1
+	Trestrict  reduce 1
+	Tchar  reduce 1
+	Tshort  reduce 1
+	Tint  reduce 1
+	Tlong  reduce 1
+	Tunsigned  reduce 1
+	Tfloat  reduce 1
+	Tdouble  reduce 1
+	Tconst  reduce 1
+	Tvolatile  reduce 1
+	Tvoid  reduce 1
+	Tstruct  reduce 1
+	Tunion  reduce 1
+	Tenum  reduce 1
+
+	nsenter  goto 315
+	declarator  goto 77
+	pointer  goto 298
+	direct_declarator  goto 67
+	abstract_declarator  goto 316
+	direct_abstract_declarator  goto 227
+
+
+state 297
+	parameter_declaration : itype declarator .  (52)
+
+	.  reduce 52
+
+
+state 298
+	declarator : pointer . direct_declarator  (26)
+	abstract_declarator : pointer .  (38)
+	abstract_declarator : pointer . direct_abstract_declarator  (40)
+
+	Tidentifier  shift 43
+	Tlbracket  shift 222
+	Tlparen  shift 296
+	Tcomma  reduce 38
+	Trparen  reduce 38
+
+	direct_declarator  goto 91
+	direct_abstract_declarator  goto 317
+
+
+state 299
+	parameter_declaration : itype abstract_declarator_opt .  (53)
+
+	.  reduce 53
+
+
+state 300
+	function_direct_declarator : direct_declarator Tlparen nsenter parameter_type_list nsleave . Trparen  (24)
+	direct_declarator : direct_declarator Tlparen nsenter parameter_type_list nsleave . Trparen  (35)
+
+	Trparen  shift 343
+	.  error
+
+
+301: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+301: shift/reduce conflict (shift 20, reduce 89) on Tchar
+301: shift/reduce conflict (shift 21, reduce 89) on Tshort
+301: shift/reduce conflict (shift 22, reduce 89) on Tint
+301: shift/reduce conflict (shift 23, reduce 89) on Tlong
+301: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+301: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+301: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+301: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+301: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+301: shift/reduce conflict (shift 29, reduce 89) on Tunion
+301: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 301
+	parameter_type_list : parameter_list Tcomma . Tellipsis  (49)
+	parameter_list : parameter_list Tcomma . parameter_declaration  (51)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Tellipsis  shift 344
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 205
+	typequalifiers  goto 32
+	parameter_declaration  goto 345
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+
+
+state 302
+	direct_declarator : direct_declarator Tlparen nsenter parameter_type_list nsleave . Trparen  (35)
+
+	Trparen  shift 346
+	.  error
+
+
+state 303
+	composite_type_decl : Tstruct sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace . Tsemi  (99)
+
+	Tsemi  shift 347
+	.  error
+
+
+state 304
+	struct_declarator : declarator .  (110)
+
+	.  reduce 110
+
+
+state 305
+	struct_declaration : itype struct_declarator_list . Tsemi  (107)
+	struct_declarator_list : struct_declarator_list . Tcomma struct_declarator  (109)
+
+	Tcomma  shift 348
+	Tsemi  shift 349
+	.  error
+
+
+state 306
+	struct_declarator_list : struct_declarator .  (108)
+
+	.  reduce 108
+
+
+state 307
+	composite_type_decl : Tunion sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace . Tsemi  (100)
+
+	Tsemi  shift 350
+	.  error
+
+
+state 308
+	composite_type_decl : Tenum sue_identifier Tlbrace enumerator_list Tcomma Trbrace Tsemi .  (98)
+
+	.  reduce 98
+
+
+state 309
+	unary_expression : Tsizeof Tlparen itypename Trparen .  (197)
+
+	.  reduce 197
+
+
+state 310
+	init : Tlbrace init_list Tcomma Trbrace .  (20)
+
+	.  reduce 20
+
+
+state 311
+	init_list : init_list Tcomma init .  (55)
+
+	.  reduce 55
+
+
+state 312
+	assignment_expression_opt : assignment_expression .  (213)
+
+	.  reduce 213
+
+
+state 313
+	direct_abstract_declarator : Tlbracket assignment_expression_opt . Trbracket  (42)
+
+	Trbracket  shift 351
+	.  error
+
+
+state 314
+	direct_abstract_declarator : Tlparen Trparen .  (44)
+
+	.  reduce 44
+
+
+315: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+315: shift/reduce conflict (shift 20, reduce 89) on Tchar
+315: shift/reduce conflict (shift 21, reduce 89) on Tshort
+315: shift/reduce conflict (shift 22, reduce 89) on Tint
+315: shift/reduce conflict (shift 23, reduce 89) on Tlong
+315: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+315: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+315: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+315: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+315: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+315: shift/reduce conflict (shift 29, reduce 89) on Tunion
+315: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 315
+	direct_abstract_declarator : Tlparen nsenter . parameter_type_list nsleave Trparen  (45)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 205
+	parameter_type_list  goto 352
+	typequalifiers  goto 32
+	parameter_list  goto 207
+	parameter_declaration  goto 208
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+
+
+state 316
+	direct_abstract_declarator : Tlparen abstract_declarator . Trparen  (41)
+
+	Trparen  shift 353
+	.  error
+
+
+state 317
+	abstract_declarator : pointer direct_abstract_declarator .  (40)
+	direct_abstract_declarator : direct_abstract_declarator . Tlbracket assignment_expression_opt Trbracket  (43)
+	direct_abstract_declarator : direct_abstract_declarator . Tlparen Trparen  (46)
+	direct_abstract_declarator : direct_abstract_declarator . Tlparen nsenter parameter_type_list nsleave Trparen  (47)
+
+	Tlbracket  shift 318
+	Tlparen  shift 319
+	Tcomma  reduce 40
+	Trparen  reduce 40
+
+
+state 318
+	direct_abstract_declarator : direct_abstract_declarator Tlbracket . assignment_expression_opt Trbracket  (43)
+	assignment_expression_opt : .  (212)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Trbracket  reduce 212
+
+	assignment_expression  goto 312
+	assignment_expression_opt  goto 354
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 319
+	direct_abstract_declarator : direct_abstract_declarator Tlparen . Trparen  (46)
+	direct_abstract_declarator : direct_abstract_declarator Tlparen . nsenter parameter_type_list nsleave Trparen  (47)
+	nsenter : .  (1)
+
+	Trparen  shift 355
+	Ttypedef_name  reduce 1
+	Trestrict  reduce 1
+	Tchar  reduce 1
+	Tshort  reduce 1
+	Tint  reduce 1
+	Tlong  reduce 1
+	Tunsigned  reduce 1
+	Tfloat  reduce 1
+	Tdouble  reduce 1
+	Tconst  reduce 1
+	Tvolatile  reduce 1
+	Tvoid  reduce 1
+	Tstruct  reduce 1
+	Tunion  reduce 1
+	Tenum  reduce 1
+
+	nsenter  goto 356
+
+
+state 320
+	cast_expression : Tlparen itypename Trparen cast_expression .  (186)
+
+	.  reduce 186
+
+
+state 321
+	expression : expression Tcomma assignment_expression .  (141)
+
+	.  reduce 141
+
+
+state 322
+	conditional_expression : logical_or_expression Tquestion expression Tcolon . conditional_expression  (155)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	conditional_expression  goto 357
+	unary_expression  goto 154
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 323
+	postfix_expression : postfix_expression Tlbracket expression Trbracket .  (199)
+
+	.  reduce 199
+
+
+state 324
+	postfix_expression : postfix_expression Tlparen argument_expression_list_opt Trparen .  (200)
+
+	.  reduce 200
+
+
+state 325
+	argument_expression_list : argument_expression_list Tcomma . assignment_expression  (211)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 358
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 326
+	labeled_statement : Tcase constant_expression . Tcolon statement  (118)
+
+	Tcolon  shift 359
+	.  error
+
+
+state 327
+	labeled_statement : Tdefault Tcolon . statement  (119)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 360
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 328
+	selection_statement : Tif Tlparen . expression Trparen statement  (130)
+	selection_statement : Tif Tlparen . expression Trparen statement Telse statement  (131)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 361
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 329
+	selection_statement : Tswitch Tlparen . expression Trparen statement  (132)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 362
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 330
+	iteration_statement : Twhile Tlparen . expression Trparen statement  (133)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 363
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 331
+	iteration_statement : Tdo statement . Twhile Tlparen expression Trparen Tsemi  (134)
+
+	Twhile  shift 364
+	.  error
+
+
+state 332
+	iteration_statement : Tfor Tlparen . expression_opt Tsemi expression_opt Tsemi expression_opt Trparen statement  (135)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	expression_opt  goto 365
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 333
+	label : Tidentifier .  (120)
+
+	.  reduce 120
+
+
+state 334
+	label : Tenum_const .  (122)
+
+	.  reduce 122
+
+
+state 335
+	jump_statement : Tgoto label . Tsemi  (136)
+
+	Tsemi  shift 366
+	.  error
+
+
+state 336
+	jump_statement : Tcontinue Tsemi .  (137)
+
+	.  reduce 137
+
+
+state 337
+	jump_statement : Tbreak Tsemi .  (138)
+
+	.  reduce 138
+
+
+state 338
+	jump_statement : Treturn expression_opt . Tsemi  (139)
+
+	Tsemi  shift 367
+	.  error
+
+
+state 339
+	compound_statement : Tlbrace nsenter . blockitem_list_opt nsleave Trbrace  (123)
+	blockitem_list_opt : .  (124)
+
+	.  reduce 124
+
+	blockitem_list_opt  goto 368
+
+
+state 340
+	function_definition : declaration_specifiers function_declarator Tlbrace nsreenter blockitem_list_opt nsleave Trbrace .  (21)
+
+	.  reduce 21
+
+
+state 341
+	labeled_statement : label Tcolon . statement  (117)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 369
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 342
+	expression_statement : expression_opt Tsemi .  (127)
+
+	.  reduce 127
+
+
+state 343
+	function_direct_declarator : direct_declarator Tlparen nsenter parameter_type_list nsleave Trparen .  (24)
+	direct_declarator : direct_declarator Tlparen nsenter parameter_type_list nsleave Trparen .  (35)
+
+	Tcomma  reduce 35
+	Tasgn  reduce 35
+	Tlbrace  reduce 24
+	Tlbracket  reduce 35
+	Tlparen  reduce 35
+	Tsemi  reduce 35
+
+
+state 344
+	parameter_type_list : parameter_list Tcomma Tellipsis .  (49)
+
+	.  reduce 49
+
+
+state 345
+	parameter_list : parameter_list Tcomma parameter_declaration .  (51)
+
+	.  reduce 51
+
+
+state 346
+	direct_declarator : direct_declarator Tlparen nsenter parameter_type_list nsleave Trparen .  (35)
+
+	.  reduce 35
+
+
+state 347
+	composite_type_decl : Tstruct sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi .  (99)
+
+	.  reduce 99
+
+
+state 348
+	struct_declarator_list : struct_declarator_list Tcomma . struct_declarator  (109)
+
+	Tidentifier  shift 43
+	Tstar  shift 44
+	Tlparen  shift 45
+	.  error
+
+	declarator  goto 304
+	pointer  goto 66
+	direct_declarator  goto 67
+	struct_declarator  goto 370
+
+
+state 349
+	struct_declaration : itype struct_declarator_list Tsemi .  (107)
+
+	.  reduce 107
+
+
+state 350
+	composite_type_decl : Tunion sue_identifier Tlbrace nsenter struct_declaration_list_opt nsleave Trbrace Tsemi .  (100)
+
+	.  reduce 100
+
+
+state 351
+	direct_abstract_declarator : Tlbracket assignment_expression_opt Trbracket .  (42)
+
+	.  reduce 42
+
+
+state 352
+	direct_abstract_declarator : Tlparen nsenter parameter_type_list . nsleave Trparen  (45)
+	nsleave : .  (2)
+
+	.  reduce 2
+
+	nsleave  goto 371
+
+
+state 353
+	direct_abstract_declarator : Tlparen abstract_declarator Trparen .  (41)
+
+	.  reduce 41
+
+
+state 354
+	direct_abstract_declarator : direct_abstract_declarator Tlbracket assignment_expression_opt . Trbracket  (43)
+
+	Trbracket  shift 372
+	.  error
+
+
+state 355
+	direct_abstract_declarator : direct_abstract_declarator Tlparen Trparen .  (46)
+
+	.  reduce 46
+
+
+356: shift/reduce conflict (shift 19, reduce 89) on Ttypedef_name
+356: shift/reduce conflict (shift 20, reduce 89) on Tchar
+356: shift/reduce conflict (shift 21, reduce 89) on Tshort
+356: shift/reduce conflict (shift 22, reduce 89) on Tint
+356: shift/reduce conflict (shift 23, reduce 89) on Tlong
+356: shift/reduce conflict (shift 24, reduce 89) on Tunsigned
+356: shift/reduce conflict (shift 25, reduce 89) on Tfloat
+356: shift/reduce conflict (shift 26, reduce 89) on Tdouble
+356: shift/reduce conflict (shift 27, reduce 89) on Tvoid
+356: shift/reduce conflict (shift 28, reduce 89) on Tstruct
+356: shift/reduce conflict (shift 29, reduce 89) on Tunion
+356: shift/reduce conflict (shift 30, reduce 89) on Tenum
+state 356
+	direct_abstract_declarator : direct_abstract_declarator Tlparen nsenter . parameter_type_list nsleave Trparen  (47)
+	typequalifiers : .  (89)
+
+	Ttypedef_name  shift 19
+	Tchar  shift 20
+	Tshort  shift 21
+	Tint  shift 22
+	Tlong  shift 23
+	Tunsigned  shift 24
+	Tfloat  shift 25
+	Tdouble  shift 26
+	Tvoid  shift 27
+	Tstruct  shift 28
+	Tunion  shift 29
+	Tenum  shift 30
+	Trestrict  reduce 89
+	Tconst  reduce 89
+	Tvolatile  reduce 89
+
+	itype  goto 205
+	parameter_type_list  goto 373
+	typequalifiers  goto 32
+	parameter_list  goto 207
+	parameter_declaration  goto 208
+	itype_simple  goto 33
+	inttype  goto 34
+	realtype  goto 35
+	composite_type  goto 36
+
+
+state 357
+	conditional_expression : logical_or_expression Tquestion expression Tcolon conditional_expression .  (155)
+
+	.  reduce 155
+
+
+state 358
+	argument_expression_list : argument_expression_list Tcomma assignment_expression .  (211)
+
+	.  reduce 211
+
+
+state 359
+	labeled_statement : Tcase constant_expression Tcolon . statement  (118)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 374
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 360
+	labeled_statement : Tdefault Tcolon statement .  (119)
+
+	.  reduce 119
+
+
+state 361
+	selection_statement : Tif Tlparen expression . Trparen statement  (130)
+	selection_statement : Tif Tlparen expression . Trparen statement Telse statement  (131)
+	expression : expression . Tcomma assignment_expression  (141)
+
+	Tcomma  shift 229
+	Trparen  shift 375
+	.  error
+
+
+state 362
+	selection_statement : Tswitch Tlparen expression . Trparen statement  (132)
+	expression : expression . Tcomma assignment_expression  (141)
+
+	Tcomma  shift 229
+	Trparen  shift 376
+	.  error
+
+
+state 363
+	iteration_statement : Twhile Tlparen expression . Trparen statement  (133)
+	expression : expression . Tcomma assignment_expression  (141)
+
+	Tcomma  shift 229
+	Trparen  shift 377
+	.  error
+
+
+state 364
+	iteration_statement : Tdo statement Twhile . Tlparen expression Trparen Tsemi  (134)
+
+	Tlparen  shift 378
+	.  error
+
+
+state 365
+	iteration_statement : Tfor Tlparen expression_opt . Tsemi expression_opt Tsemi expression_opt Trparen statement  (135)
+
+	Tsemi  shift 379
+	.  error
+
+
+state 366
+	jump_statement : Tgoto label Tsemi .  (136)
+
+	.  reduce 136
+
+
+state 367
+	jump_statement : Treturn expression_opt Tsemi .  (139)
+
+	.  reduce 139
+
+
+368: shift/reduce conflict (shift 268, reduce 91) on Ttypedef_name
+368: shift/reduce conflict (shift 9, reduce 91) on Tstruct
+368: shift/reduce conflict (shift 10, reduce 91) on Tunion
+368: shift/reduce conflict (shift 11, reduce 91) on Tenum
+state 368
+	compound_statement : Tlbrace nsenter blockitem_list_opt . nsleave Trbrace  (123)
+	blockitem_list_opt : blockitem_list_opt . declaration  (125)
+	blockitem_list_opt : blockitem_list_opt . statement  (126)
+	nsleave : .  (2)
+	storage_class_specifier : .  (91)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Ttypedef  shift 6
+	Textern  shift 7
+	Tstatic  shift 8
+	Tstruct  shift 9
+	Tunion  shift 10
+	Tenum  shift 11
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Trestrict  reduce 91
+	Tchar  reduce 91
+	Tshort  reduce 91
+	Tint  reduce 91
+	Tlong  reduce 91
+	Tunsigned  reduce 91
+	Tfloat  reduce 91
+	Tdouble  reduce 91
+	Tconst  reduce 91
+	Tvolatile  reduce 91
+	Tvoid  reduce 91
+	Trbrace  reduce 2
+	Tsemi  reduce 128
+
+	nsleave  goto 380
+	declaration  goto 283
+	declaration_specifiers  goto 284
+	storage_class_specifier  goto 17
+	composite_type_decl  goto 18
+	assignment_expression  goto 164
+	statement  goto 285
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 369
+	labeled_statement : label Tcolon statement .  (117)
+
+	.  reduce 117
+
+
+state 370
+	struct_declarator_list : struct_declarator_list Tcomma struct_declarator .  (109)
+
+	.  reduce 109
+
+
+state 371
+	direct_abstract_declarator : Tlparen nsenter parameter_type_list nsleave . Trparen  (45)
+
+	Trparen  shift 381
+	.  error
+
+
+state 372
+	direct_abstract_declarator : direct_abstract_declarator Tlbracket assignment_expression_opt Trbracket .  (43)
+
+	.  reduce 43
+
+
+state 373
+	direct_abstract_declarator : direct_abstract_declarator Tlparen nsenter parameter_type_list . nsleave Trparen  (47)
+	nsleave : .  (2)
+
+	.  reduce 2
+
+	nsleave  goto 382
+
+
+state 374
+	labeled_statement : Tcase constant_expression Tcolon statement .  (118)
+
+	.  reduce 118
+
+
+state 375
+	selection_statement : Tif Tlparen expression Trparen . statement  (130)
+	selection_statement : Tif Tlparen expression Trparen . statement Telse statement  (131)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 383
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 376
+	selection_statement : Tswitch Tlparen expression Trparen . statement  (132)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 384
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 377
+	iteration_statement : Twhile Tlparen expression Trparen . statement  (133)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 385
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 378
+	iteration_statement : Tdo statement Twhile Tlparen . expression Trparen Tsemi  (134)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	.  error
+
+	assignment_expression  goto 164
+	expression  goto 386
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 379
+	iteration_statement : Tfor Tlparen expression_opt Tsemi . expression_opt Tsemi expression_opt Trparen statement  (135)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	expression_opt  goto 387
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 380
+	compound_statement : Tlbrace nsenter blockitem_list_opt nsleave . Trbrace  (123)
+
+	Trbrace  shift 388
+	.  error
+
+
+state 381
+	direct_abstract_declarator : Tlparen nsenter parameter_type_list nsleave Trparen .  (45)
+
+	.  reduce 45
+
+
+state 382
+	direct_abstract_declarator : direct_abstract_declarator Tlparen nsenter parameter_type_list nsleave . Trparen  (47)
+
+	Trparen  shift 389
+	.  error
+
+
+383: shift/reduce conflict (shift 390, reduce 130) on Telse
+state 383
+	selection_statement : Tif Tlparen expression Trparen statement .  (130)
+	selection_statement : Tif Tlparen expression Trparen statement . Telse statement  (131)
+
+	Telse  shift 390
+	Tidentifier  reduce 130
+	Ttypedef_name  reduce 130
+	Tenum_const  reduce 130
+	Tcharacter_cst  reduce 130
+	Tinteger_cst  reduce 130
+	Tfloating_cst  reduce 130
+	Tstring_literal  reduce 130
+	Tsizeof  reduce 130
+	Tplusplus  reduce 130
+	Tminusminus  reduce 130
+	Ttypedef  reduce 130
+	Textern  reduce 130
+	Tstatic  reduce 130
+	Trestrict  reduce 130
+	Tchar  reduce 130
+	Tshort  reduce 130
+	Tint  reduce 130
+	Tlong  reduce 130
+	Tunsigned  reduce 130
+	Tfloat  reduce 130
+	Tdouble  reduce 130
+	Tconst  reduce 130
+	Tvolatile  reduce 130
+	Tvoid  reduce 130
+	Tstruct  reduce 130
+	Tunion  reduce 130
+	Tenum  reduce 130
+	Tcase  reduce 130
+	Tdefault  reduce 130
+	Tif  reduce 130
+	Tswitch  reduce 130
+	Twhile  reduce 130
+	Tdo  reduce 130
+	Tfor  reduce 130
+	Tgoto  reduce 130
+	Tcontinue  reduce 130
+	Tbreak  reduce 130
+	Treturn  reduce 130
+	Tamp  reduce 130
+	Ttilde  reduce 130
+	Tbang  reduce 130
+	Tplus  reduce 130
+	Tminus  reduce 130
+	Tstar  reduce 130
+	Tlbrace  reduce 130
+	Trbrace  reduce 130
+	Tlparen  reduce 130
+	Tsemi  reduce 130
+
+
+state 384
+	selection_statement : Tswitch Tlparen expression Trparen statement .  (132)
+
+	.  reduce 132
+
+
+state 385
+	iteration_statement : Twhile Tlparen expression Trparen statement .  (133)
+
+	.  reduce 133
+
+
+state 386
+	iteration_statement : Tdo statement Twhile Tlparen expression . Trparen Tsemi  (134)
+	expression : expression . Tcomma assignment_expression  (141)
+
+	Tcomma  shift 229
+	Trparen  shift 391
+	.  error
+
+
+state 387
+	iteration_statement : Tfor Tlparen expression_opt Tsemi expression_opt . Tsemi expression_opt Trparen statement  (135)
+
+	Tsemi  shift 392
+	.  error
+
+
+state 388
+	compound_statement : Tlbrace nsenter blockitem_list_opt nsleave Trbrace .  (123)
+
+	.  reduce 123
+
+
+state 389
+	direct_abstract_declarator : direct_abstract_declarator Tlparen nsenter parameter_type_list nsleave Trparen .  (47)
+
+	.  reduce 47
+
+
+state 390
+	selection_statement : Tif Tlparen expression Trparen statement Telse . statement  (131)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 393
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 391
+	iteration_statement : Tdo statement Twhile Tlparen expression Trparen . Tsemi  (134)
+
+	Tsemi  shift 394
+	.  error
+
+
+state 392
+	iteration_statement : Tfor Tlparen expression_opt Tsemi expression_opt Tsemi . expression_opt Trparen statement  (135)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 100
+	Tenum_const  shift 101
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlparen  shift 116
+	Trparen  reduce 128
+
+	assignment_expression  goto 164
+	expression_opt  goto 395
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 393
+	selection_statement : Tif Tlparen expression Trparen statement Telse statement .  (131)
+
+	.  reduce 131
+
+
+state 394
+	iteration_statement : Tdo statement Twhile Tlparen expression Trparen Tsemi .  (134)
+
+	.  reduce 134
+
+
+state 395
+	iteration_statement : Tfor Tlparen expression_opt Tsemi expression_opt Tsemi expression_opt . Trparen statement  (135)
+
+	Trparen  shift 396
+	.  error
+
+
+state 396
+	iteration_statement : Tfor Tlparen expression_opt Tsemi expression_opt Tsemi expression_opt Trparen . statement  (135)
+	expression_opt : .  (128)
+
+	Tidentifier  shift 267
+	Ttypedef_name  shift 268
+	Tenum_const  shift 269
+	Tcharacter_cst  shift 102
+	Tinteger_cst  shift 103
+	Tfloating_cst  shift 104
+	Tstring_literal  shift 105
+	Tsizeof  shift 106
+	Tplusplus  shift 107
+	Tminusminus  shift 108
+	Tcase  shift 270
+	Tdefault  shift 271
+	Tif  shift 272
+	Tswitch  shift 273
+	Twhile  shift 274
+	Tdo  shift 275
+	Tfor  shift 276
+	Tgoto  shift 277
+	Tcontinue  shift 278
+	Tbreak  shift 279
+	Treturn  shift 280
+	Tamp  shift 109
+	Ttilde  shift 110
+	Tbang  shift 111
+	Tplus  shift 112
+	Tminus  shift 113
+	Tstar  shift 114
+	Tlbrace  shift 281
+	Tlparen  shift 116
+	Tsemi  reduce 128
+
+	assignment_expression  goto 164
+	statement  goto 397
+	labeled_statement  goto 286
+	compound_statement  goto 287
+	expression_statement  goto 288
+	selection_statement  goto 289
+	iteration_statement  goto 290
+	jump_statement  goto 291
+	label  goto 292
+	expression_opt  goto 293
+	expression  goto 294
+	conditional_expression  goto 119
+	unary_expression  goto 120
+	logical_or_expression  goto 121
+	logical_and_expression  goto 122
+	inclusive_or_expression  goto 123
+	exclusive_or_expression  goto 124
+	and_expression  goto 125
+	equality_expression  goto 126
+	relation_expression  goto 127
+	shift_expression  goto 128
+	additive_expression  goto 129
+	multiplicative_expression  goto 130
+	cast_expression  goto 131
+	postfix_expression  goto 132
+	primary_expression  goto 133
+	constant  goto 134
+
+
+state 397
+	iteration_statement : Tfor Tlparen expression_opt Tsemi expression_opt Tsemi expression_opt Trparen statement .  (135)
+
+	.  reduce 135
+
+
+State 4 contains 3 shift/reduce conflicts.
+State 6 contains 12 shift/reduce conflicts.
+State 17 contains 12 shift/reduce conflicts.
+State 116 contains 12 shift/reduce conflicts.
+State 140 contains 12 shift/reduce conflicts.
+State 143 contains 12 shift/reduce conflicts.
+State 144 contains 12 shift/reduce conflicts.
+State 145 contains 12 shift/reduce conflicts.
+State 149 contains 12 shift/reduce conflicts.
+State 203 contains 4 shift/reduce conflicts.
+State 301 contains 12 shift/reduce conflicts.
+State 315 contains 12 shift/reduce conflicts.
+State 356 contains 12 shift/reduce conflicts.
+State 368 contains 4 shift/reduce conflicts.
+State 383 contains 1 shift/reduce conflict.
+
+
+99 terminals, 75 nonterminals
+220 grammar rules, 398 states
