@@ -5,8 +5,6 @@ open Lexing
 open Parser
 open Format
 
-let f msg = Printf.printf "%s\n" msg
-
 type error =
   | Unterminated_string
 exception Error of error * Srcloc.t

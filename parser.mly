@@ -3,8 +3,6 @@ open Tree
 open Type
 open Lexing
 
-let dbg msg = Printf.printf "%s\n" msg
-
 let mktop desc = {
     top_desc = desc;
     top_loc = Srcloc.symbol_rloc();

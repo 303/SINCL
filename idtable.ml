@@ -3,8 +3,6 @@
 open Parsererr
 open Tree
 
-let f() = Printf.printf "HOGEHOGE\n"
-
 let idtable_normal = Hashtbl.create 389
 let idtable_sue    = Hashtbl.create 53 
 let idtable_label  = Hashtbl.create 53 
